@@ -1,0 +1,244 @@
+.block_exam_calculator .no-overflow {
+    overflow: visible;
+}
+
+.block_exam_calculator .content,
+.block_exam_calculator .card-text {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.block_exam_calculator .advanced-calculator {
+    --calc-border: #d7dde8;
+    --calc-panel: #f7f9fc;
+    --calc-panel-strong: #e7eef9;
+    --calc-text: #1f2937;
+    --calc-accent: #0f6cbf;
+    --calc-accent-strong: #0b4f8a;
+    --calc-danger: #b42318;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    color: var(--calc-text);
+    font-size: 0.95rem;
+}
+
+.block_exam_calculator .advanced-calculator__shell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    border: 1px solid var(--calc-border);
+    border-radius: 0.85rem;
+    background: linear-gradient(180deg, #ffffff 0%, var(--calc-panel) 100%);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.block_exam_calculator .advanced-calculator__top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.block_exam_calculator .advanced-calculator__mode {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--calc-panel-strong);
+    color: var(--calc-accent-strong);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.block_exam_calculator .advanced-calculator__screen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.block_exam_calculator .advanced-calculator__operation {
+    min-height: 1.2rem;
+    color: #526071;
+    font-size: 0.8rem;
+    text-align: right;
+    user-select: text;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.block_exam_calculator .advanced-calculator__input {
+    width: 100%;
+    border: 1px solid var(--calc-border);
+    border-radius: 0.7rem;
+    background: #fff;
+    padding: 0.65rem 0.75rem;
+}
+
+.block_exam_calculator .advanced-calculator__input {
+    min-height: 3.1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: right;
+    line-height: 1.4;
+}
+
+.block_exam_calculator .advanced-calculator__error {
+    display: none;
+    border-radius: 0.7rem;
+    background: #fff2f1;
+    color: var(--calc-danger);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.82rem;
+}
+
+.block_exam_calculator .advanced-calculator__error.is-visible {
+    display: block;
+}
+
+.block_exam_calculator .advanced-calculator__history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.block_exam_calculator .advanced-calculator__history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.block_exam_calculator .advanced-calculator__history-title {
+    color: #526071;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.block_exam_calculator .advanced-calculator__history-clear {
+    border: 0;
+    background: transparent;
+    color: var(--calc-accent);
+    padding: 0;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.block_exam_calculator .advanced-calculator__history-clear:hover,
+.block_exam_calculator .advanced-calculator__history-clear:focus {
+    color: var(--calc-accent-strong);
+    text-decoration: underline;
+}
+
+.block_exam_calculator .advanced-calculator__history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.block_exam_calculator .advanced-calculator__history-item {
+    border: 1px solid var(--calc-border);
+    border-radius: 0.65rem;
+    background: #fff;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    user-select: text;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.block_exam_calculator .advanced-calculator__history-expression {
+    color: #526071;
+}
+
+.block_exam_calculator .advanced-calculator__history-result {
+    font-weight: 700;
+}
+
+.block_exam_calculator .advanced-calculator__toggles {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.block_exam_calculator .advanced-calculator__toggle {
+    flex: 1 1 auto;
+    border: 1px solid var(--calc-border);
+    border-radius: 0.6rem;
+    background: #fff;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.block_exam_calculator .advanced-calculator__toggle.is-active {
+    border-color: var(--calc-accent);
+    background: #e8f2fb;
+    color: var(--calc-accent-strong);
+}
+
+.block_exam_calculator .advanced-calculator__panel {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.4rem;
+}
+
+.block_exam_calculator .advanced-calculator__panel--scientific {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.block_exam_calculator .advanced-calculator__panel--memory {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.block_exam_calculator .advanced-calculator__btn {
+    border: 1px solid var(--calc-border);
+    border-radius: 0.7rem;
+    background: #fff;
+    color: var(--calc-text);
+    min-height: 2.5rem;
+    padding: 0.4rem 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+}
+
+.block_exam_calculator .advanced-calculator__btn:hover,
+.block_exam_calculator .advanced-calculator__btn:focus {
+    border-color: #95b8de;
+    background: #f8fbff;
+    transform: translateY(-1px);
+}
+
+.block_exam_calculator .advanced-calculator__btn--accent {
+    border-color: var(--calc-accent);
+    background: var(--calc-accent);
+    color: #fff;
+}
+
+.block_exam_calculator .advanced-calculator__btn--accent:hover,
+.block_exam_calculator .advanced-calculator__btn--accent:focus {
+    border-color: var(--calc-accent-strong);
+    background: var(--calc-accent-strong);
+}
+
+.block_exam_calculator .advanced-calculator__btn--soft {
+    background: var(--calc-panel-strong);
+}
+
+.block_exam_calculator .advanced-calculator__hint {
+    color: #526071;
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
