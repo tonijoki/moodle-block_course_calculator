@@ -1,0 +1,101 @@
+<div id="{{elementid}}" class="advanced-calculator" data-mode="{{#isbasic}}basic{{/isbasic}}{{#isscientific}}scientific{{/isscientific}}">
+    <div class="advanced-calculator__shell">
+        <div class="advanced-calculator__top">
+            <span class="advanced-calculator__mode">{{modebadge}}</span>
+        </div>
+
+        <div class="advanced-calculator__screen">
+            <div class="advanced-calculator__operation" data-region="operation" tabindex="0"></div>
+            <input
+                type="text"
+                class="advanced-calculator__input"
+                data-region="display"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                inputmode="text"
+                aria-label="{{#str}}inputlabel, block_exam_calculator{{/str}}"
+            >
+            <div class="advanced-calculator__error" data-region="error" aria-live="polite"></div>
+        </div>
+
+        <div class="advanced-calculator__history">
+            <div class="advanced-calculator__history-header">
+                <div class="advanced-calculator__history-title">{{#str}}historytitle, block_exam_calculator{{/str}}</div>
+                <button type="button" class="advanced-calculator__history-clear" data-action="history-clear">{{#str}}clearhistory, block_exam_calculator{{/str}}</button>
+            </div>
+            <div class="advanced-calculator__history-list" data-region="history"></div>
+        </div>
+
+        <div class="advanced-calculator__panel advanced-calculator__panel--memory">
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-clear">MC</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-recall">MR</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-add">M+</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-subtract">M-</button>
+        </div>
+
+        {{#isscientific}}
+        <div class="advanced-calculator__toggles">
+            <button type="button" class="advanced-calculator__toggle is-active" data-action="angle-mode" data-value="DEG">DEG</button>
+            <button type="button" class="advanced-calculator__toggle" data-action="angle-mode" data-value="RAD">RAD</button>
+        </div>
+        <div class="advanced-calculator__panel advanced-calculator__panel--scientific">
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="sin(">sin</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="cos(">cos</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="tan(">tan</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="asin(">asin</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="acos(">acos</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="atan(">atan</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="ln(">ln</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="log(">log</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="exp(">exp</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="abs(">abs</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="pow(">pow</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="pi">pi</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="e">e</button>
+        </div>
+        {{/isscientific}}
+
+        <div class="advanced-calculator__panel">
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="percent">%</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="clear-entry">CE</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="clear">C</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="backspace">DEL</button>
+
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="unary" data-value="reciprocal">1/x</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="unary" data-value="square">x2</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="unary" data-value="sqrt">sqrt</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="/">/</button>
+
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="7">7</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="8">8</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="9">9</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="*">*</button>
+
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="4">4</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="5">5</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="6">6</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="-">-</button>
+
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="1">1</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="2">2</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="3">3</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="+">+</button>
+
+            {{#isscientific}}
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="!">n!</button>
+            {{/isscientific}}
+            {{#isbasic}}
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="sign">+/-</button>
+            {{/isbasic}}
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="0">0</button>
+            <button type="button" class="advanced-calculator__btn" data-action="insert" data-value="{{decimalseparator}}">{{decimalseparator}}</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--accent" data-action="evaluate">=</button>
+        </div>
+
+        <div class="advanced-calculator__hint">
+            {{#isbasic}}{{#str}}hintbasic, block_exam_calculator{{/str}}{{/isbasic}}
+            {{#isscientific}}{{#str}}hintscientific, block_exam_calculator{{/str}}{{/isscientific}}
+        </div>
+    </div>
+</div>
