@@ -36,6 +36,7 @@ $string['historytitle'] = 'History';
 $string['clearhistory'] = 'Clear';
 $string['hintbasic'] = 'Basic mode supports arithmetic, brackets, decimal values, modulo and sign toggle.';
 $string['hintscientific'] = 'Scientific mode adds powers, factorial, constants and common scientific functions.';
+$string['privacy:metadata'] = 'The Exam Calculator block does not store any personal data.';
 
 $string['errorinvalidexpression'] = 'Invalid expression.';
 $string['errordivisionbyzero'] = 'Division by zero is not allowed.';

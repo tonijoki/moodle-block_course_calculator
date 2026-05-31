@@ -27,13 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
 
     'block/exam_calculator:addinstance' => [
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => [
-            'user' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
 
-        'clonepermissionsfrom' => 'moodle/my:manageblocks',
+        'clonepermissionsfrom' => 'moodle/site:manageblocks',
     ],
     'block/exam_calculator:myaddinstance' => [
         'captype' => 'write',
@@ -45,4 +47,3 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/my:manageblocks',
     ],
 ];
-

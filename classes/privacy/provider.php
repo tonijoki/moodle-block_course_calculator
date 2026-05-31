@@ -15,17 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information.
+ * Privacy provider.
  *
  * @package    block_exam_calculator
  * @copyright  2024 Toni Jokinen
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace block_exam_calculator\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'block_exam_calculator';
-$plugin->version = 2026053100;
-$plugin->requires = 2018051700;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.0.0';
+/**
+ * The exam calculator block does not store personal data.
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Explain that this plugin stores no personal data.
+     *
+     * @return string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}
