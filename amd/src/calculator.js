@@ -17,6 +17,11 @@ define(['core/str'], function(Str) {
         log: {min: 1, max: 1},
         exp: {min: 1, max: 1},
         pow: {min: 2, max: 2},
+        min: {min: 1, max: Infinity},
+        max: {min: 1, max: Infinity},
+        round: {min: 1, max: 1},
+        floor: {min: 1, max: 1},
+        ceil: {min: 1, max: 1},
     };
     const messages = {};
 
@@ -378,6 +383,11 @@ define(['core/str'], function(Str) {
                 return ensureFinite(Math.log(args[0]) / Math.log(10));
             case "exp": return ensureFinite(Math.exp(args[0]));
             case "pow": return ensureFinite(Math.pow(args[0], args[1]));
+            case "min": return ensureFinite(Math.min.apply(null, args));
+            case "max": return ensureFinite(Math.max.apply(null, args));
+            case "round": return ensureFinite(Math.round(args[0]));
+            case "floor": return ensureFinite(Math.floor(args[0]));
+            case "ceil": return ensureFinite(Math.ceil(args[0]));
             default: throw new Error("errorunknownfunction");
         }
     };

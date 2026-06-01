@@ -221,6 +221,32 @@ class behat_block_exam_calculator extends behat_base {
     }
 
     /**
+     * Type an expression into the calculator display.
+     *
+     * @When /^I type "([^"]*)" in the exam calculator block$/
+     * @param string $expression
+     * @return void
+     */
+    public function i_type_in_the_exam_calculator_block(string $expression): void {
+        $display = $this->find('css', '.block_exam_calculator [data-region="display"]');
+        if (!$display) {
+            throw new \Exception('Calculator display was not found.');
+        }
+
+        $display->focus();
+        $display->keyDown('a', 'ctrl');
+        $display->keyUp('a', 'ctrl');
+        $display->keyDown('Backspace');
+        $display->keyUp('Backspace');
+        $display->setValue('');
+        $display->setValue($expression);
+        $this->getSession()->executeScript(
+            "var input = document.querySelector('.block_exam_calculator [data-region=\"display\"]');" .
+            "input.dispatchEvent(new Event('input', {bubbles: true}));"
+        );
+    }
+
+    /**
      * Check display value.
      *
      * @Then /^the exam calculator display should be "([^"]*)"$/
@@ -236,6 +262,32 @@ class behat_block_exam_calculator extends behat_base {
         $actual = (string)$display->getValue();
         if ($actual !== $expected) {
             throw new \Exception('Expected calculator display "' . $expected . '" but found "' . $actual . '".');
+        }
+    }
+
+    /**
+     * Check numeric display value with a tolerance.
+     *
+     * @Then /^the exam calculator display should be approximately "([^"]*)"$/
+     * @param string $expected
+     * @return void
+     */
+    public function the_exam_calculator_display_should_be_approximately(string $expected): void {
+        $display = $this->find('css', '.block_exam_calculator [data-region="display"]');
+        if (!$display) {
+            throw new \Exception('Calculator display was not found.');
+        }
+
+        $actual = str_replace(' ', '', (string)$display->getValue());
+        $expectednumber = (float)$expected;
+        $actualnumber = (float)$actual;
+        $tolerance = 0.000000001;
+
+        if (abs($actualnumber - $expectednumber) > $tolerance) {
+            throw new \Exception(
+                'Expected calculator display approximately "' . $expected .
+                '" but found "' . $actual . '".'
+            );
         }
     }
 

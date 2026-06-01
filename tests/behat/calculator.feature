@@ -86,6 +86,37 @@ Feature: Use the exam calculator block
       | 8 | M+ | C | MR |
     Then the exam calculator display should be "8"
 
+  Scenario Outline: Scientific mode matches reference calculations
+    Given the exam calculator block mode is "scientific"
+    When I type "<expression>" in the exam calculator block
+    And I press "=" in the exam calculator block
+    Then the exam calculator display should be approximately "<result>"
+
+    Examples:
+      | expression      | result       |
+      | 2+2*3           | 8            |
+      | (2+2)*3         | 12           |
+      | 10/4            | 2.5          |
+      | sqrt(2)         | 1.4142135624 |
+      | sin(30)         | 0.5          |
+      | cos(60)         | 0.5          |
+      | tan(45)         | 1            |
+      | asin(0.5)       | 30           |
+      | acos(0.5)       | 60           |
+      | atan(1)         | 45           |
+      | log(100)        | 2            |
+      | ln(e)           | 1            |
+      | exp(1)          | 2.7182818285 |
+      | 2^10            | 1024         |
+      | 5!              | 120          |
+      | pow(2,10)       | 1024         |
+      | abs(-12.5)      | 12.5         |
+      | min(4,2,8)      | 2            |
+      | max(4,2,8)      | 8            |
+      | round(2.6)      | 3            |
+      | floor(2.9)      | 2            |
+      | ceil(2.1)       | 3            |
+
   Scenario: Basic mode uses dot decimals for Moodle answer compatibility
     Then the exam calculator mode badge should be "BASIC"
     When I press the following buttons in the exam calculator block:

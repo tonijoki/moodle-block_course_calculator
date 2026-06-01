@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_exam_calculator';
-$plugin->version = 2026053100;
+$plugin->version = 2026060100;
 $plugin->requires = 2018051700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = 'v1.0.0';
