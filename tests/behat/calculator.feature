@@ -137,7 +137,7 @@ Feature: Use the exam calculator block
     Then the exam calculator display should be "3.5"
     And the exam calculator operation should be "1.2+2.3 ="
 
-  Scenario: Basic mode accepts comma decimal input and outputs dot decimals
+  Scenario: Basic mode normalises typed comma decimals to dot decimals
     Then the exam calculator mode badge should be "BASIC"
     When I type "1,2+2,3" in the exam calculator block
     And I press "=" in the exam calculator block
@@ -151,7 +151,7 @@ Feature: Use the exam calculator block
     Then the exam calculator display should be "5.9"
     And the exam calculator operation should be "6.0-0.1 ="
 
-  Scenario: Scientific mode accepts comma decimal input and outputs dot decimals
+  Scenario: Scientific mode normalises typed comma decimals to dot decimals
     Given the exam calculator block mode is "scientific"
     When I type "6,0-0,1" in the exam calculator block
     And I press "=" in the exam calculator block
