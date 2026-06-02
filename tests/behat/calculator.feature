@@ -139,7 +139,9 @@ Feature: Use the exam calculator block
 
   Scenario: Basic mode normalises typed comma decimals to dot decimals
     Then the exam calculator mode badge should be "BASIC"
-    When I type "1,2+2,3" in the exam calculator block
+    When I type "1,2" in the exam calculator block
+    And I press "+" in the exam calculator block
+    And I type "2,3" in the exam calculator block
     And I press "=" in the exam calculator block
     Then the exam calculator display should be "3.5"
     And the exam calculator operation should be "1.2+2.3 ="
