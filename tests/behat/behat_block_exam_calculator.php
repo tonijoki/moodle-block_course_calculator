@@ -233,13 +233,17 @@ class behat_block_exam_calculator extends behat_base {
             throw new \Exception('Calculator display was not found.');
         }
 
-        $display->focus();
+        $escaped = json_encode($expression);
         $this->getSession()->executeScript(
             "var input = document.querySelector('.block_exam_calculator [data-region=\"display\"]');" .
             "input.focus();" .
-            "input.setSelectionRange(0, input.value.length);"
+            "input.setSelectionRange(0, input.value.length);" .
+            "var event = new Event('paste', {bubbles: true, cancelable: true});" .
+            "Object.defineProperty(event, 'clipboardData', {" .
+            "value: {getData: function(type) {return type === 'text/plain' ? " . $escaped . " : '';}}" .
+            "});" .
+            "input.dispatchEvent(event);"
         );
-        $display->setValue($expression);
     }
 
     /**
