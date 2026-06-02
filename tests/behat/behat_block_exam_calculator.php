@@ -233,15 +233,11 @@ class behat_block_exam_calculator extends behat_base {
             throw new \Exception('Calculator display was not found.');
         }
 
-        $display->focus();
-        $display->keyDown('a', 'ctrl');
-        $display->keyUp('a', 'ctrl');
-        $display->keyDown('Backspace');
-        $display->keyUp('Backspace');
-        $display->setValue('');
-        $display->setValue($expression);
+        $escaped = json_encode($expression);
         $this->getSession()->executeScript(
             "var input = document.querySelector('.block_exam_calculator [data-region=\"display\"]');" .
+            "input.focus();" .
+            "input.value = " . $escaped . ";" .
             "input.dispatchEvent(new Event('input', {bubbles: true}));"
         );
     }
@@ -260,7 +256,7 @@ class behat_block_exam_calculator extends behat_base {
         }
 
         $actual = (string)$display->getValue();
-        if ($actual !== $expected) {
+        if ($this->normalise_calculator_text($actual) !== $this->normalise_calculator_text($expected)) {
             throw new \Exception('Expected calculator display "' . $expected . '" but found "' . $actual . '".');
         }
     }
@@ -278,7 +274,7 @@ class behat_block_exam_calculator extends behat_base {
             throw new \Exception('Calculator display was not found.');
         }
 
-        $actual = str_replace(' ', '', (string)$display->getValue());
+        $actual = $this->normalise_calculator_text((string)$display->getValue());
         $expectednumber = (float)$expected;
         $actualnumber = (float)$actual;
         $tolerance = 0.000000001;
@@ -305,9 +301,19 @@ class behat_block_exam_calculator extends behat_base {
         }
 
         $actual = trim((string)$operation->getText());
-        if ($actual !== $expected) {
+        if ($this->normalise_calculator_text($actual) !== $this->normalise_calculator_text($expected)) {
             throw new \Exception('Expected calculator operation "' . $expected . '" but found "' . $actual . '".');
         }
+    }
+
+    /**
+     * Normalise calculator text for locale-independent Behat comparisons.
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function normalise_calculator_text(string $value): string {
+        return str_replace([',', ' '], '', $value);
     }
 
     /**
