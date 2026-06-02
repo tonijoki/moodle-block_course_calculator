@@ -109,13 +109,26 @@ Feature: Use the exam calculator block
       | exp(1)          | 2.7182818285 |
       | 2^10            | 1024         |
       | 5!              | 120          |
-      | pow(2;10)       | 1024         |
       | abs(-12.5)      | 12.5         |
-      | min(4;2;8)      | 2            |
-      | max(4;2;8)      | 8            |
       | round(2.6)      | 3            |
       | floor(2.9)      | 2            |
       | ceil(2.1)       | 3            |
+
+  Scenario: Scientific mode supports two argument power function
+    Given the exam calculator block mode is "scientific"
+    When I type "pow(2;10)" in the exam calculator block
+    And I press "=" in the exam calculator block
+    Then the exam calculator display should be approximately "1024"
+
+  Scenario: Scientific mode supports minimum and maximum functions
+    Given the exam calculator block mode is "scientific"
+    When I type "min(4;2;8)" in the exam calculator block
+    And I press "=" in the exam calculator block
+    Then the exam calculator display should be approximately "2"
+    When I press "C" in the exam calculator block
+    And I type "max(4;2;8)" in the exam calculator block
+    And I press "=" in the exam calculator block
+    Then the exam calculator display should be approximately "8"
 
   Scenario: Basic mode uses dot decimals for Moodle answer compatibility
     Then the exam calculator mode badge should be "BASIC"
