@@ -14,6 +14,10 @@
 - Copying from the display preserves a plain numeric value without visual grouping spaces
 - Dot decimal output for Moodle quiz answer compatibility
 
+## Requirements
+
+- Moodle 4.5 or later
+
 ## Installation
 
 Install the plugin using Moodle's standard plugin installation process:
