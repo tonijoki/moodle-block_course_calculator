@@ -17,17 +17,17 @@
 /**
  * Privacy provider.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_exam_calculator\privacy;
+namespace block_course_calculator\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The exam calculator block does not store personal data.
+ * The Course Calculator block does not store personal data.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
 

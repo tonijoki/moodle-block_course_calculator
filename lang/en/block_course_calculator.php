@@ -17,14 +17,14 @@
 /**
  * Language strings.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Exam Calculator';
-$string['exam_calculator:addinstance'] = 'Add a new exam calculator block';
-$string['exam_calculator:myaddinstance'] = 'Add a new exam calculator block to My home';
+$string['pluginname'] = 'Course Calculator';
+$string['course_calculator:addinstance'] = 'Add a new Course Calculator block';
+$string['course_calculator:myaddinstance'] = 'Add a new Course Calculator block to My home';
 
 $string['config:calculatormode'] = 'Calculator mode';
 $string['config:calculatormode_help'] = 'Choose whether this block instance shows a basic calculator or a scientific calculator.';
@@ -36,7 +36,7 @@ $string['historytitle'] = 'History';
 $string['clearhistory'] = 'Clear';
 $string['hintbasic'] = 'Basic mode supports arithmetic, brackets, decimal values, modulo and sign toggle.';
 $string['hintscientific'] = 'Scientific mode adds powers, factorial, constants and common scientific functions.';
-$string['privacy:metadata'] = 'The Exam Calculator block does not store any personal data.';
+$string['privacy:metadata'] = 'The Course Calculator block does not store any personal data.';
 
 $string['errorinvalidexpression'] = 'Invalid expression.';
 $string['errordivisionbyzero'] = 'Division by zero is not allowed.';

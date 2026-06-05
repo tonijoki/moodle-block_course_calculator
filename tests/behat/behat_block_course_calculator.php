@@ -15,20 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Behat steps for block_exam_calculator.
+ * Behat steps for block_course_calculator.
  *
- * @package    block_exam_calculator
+ * @package    block_course_calculator
  * @category   test
- * @copyright  2024 Toni Jokinen
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 /**
- * Behat steps for the exam calculator block.
+ * Behat steps for the Course Calculator block.
  */
-class behat_block_exam_calculator extends behat_base {
+class behat_block_course_calculator extends behat_base {
 
     /**
      * Return the outer Moodle block element.
@@ -36,9 +36,9 @@ class behat_block_exam_calculator extends behat_base {
      * @return \Behat\Mink\Element\NodeElement
      */
     protected function get_block_element() {
-        $block = $this->find('css', '.block_exam_calculator');
+        $block = $this->find('css', '.block_course_calculator');
         if (!$block) {
-            throw new \Exception('Exam Calculator block was not found on the page.');
+            throw new \Exception('Course Calculator block was not found on the page.');
         }
 
         return $block;
@@ -76,7 +76,7 @@ class behat_block_exam_calculator extends behat_base {
             return (int)$matches[1];
         }
 
-        throw new \Exception('Could not determine exam calculator block instance id.');
+        throw new \Exception('Could not determine Course Calculator block instance id.');
     }
 
     /**
@@ -113,59 +113,59 @@ class behat_block_exam_calculator extends behat_base {
         if ($label === '=') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="evaluate"]'
+                '.block_course_calculator .advanced-calculator button[data-action="evaluate"]'
             );
         } else if ($label === 'C') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="clear"]'
+                '.block_course_calculator .advanced-calculator button[data-action="clear"]'
             );
         } else if ($label === 'DEL') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="backspace"]'
+                '.block_course_calculator .advanced-calculator button[data-action="backspace"]'
             );
         } else if ($label === 'CE') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="clear-entry"]'
+                '.block_course_calculator .advanced-calculator button[data-action="clear-entry"]'
             );
         } else if ($label === '%') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="percent"]'
+                '.block_course_calculator .advanced-calculator button[data-action="percent"]'
             );
         } else if ($label === 'MC') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="memory-clear"]'
+                '.block_course_calculator .advanced-calculator button[data-action="memory-clear"]'
             );
         } else if ($label === 'MR') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="memory-recall"]'
+                '.block_course_calculator .advanced-calculator button[data-action="memory-recall"]'
             );
         } else if ($label === 'M+') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="memory-add"]'
+                '.block_course_calculator .advanced-calculator button[data-action="memory-add"]'
             );
         } else if ($label === 'M-') {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-action="memory-subtract"]'
+                '.block_course_calculator .advanced-calculator button[data-action="memory-subtract"]'
             );
         } else {
             $button = $this->find(
                 'css',
-                '.block_exam_calculator .advanced-calculator button[data-value="' . addslashes($label) . '"]'
+                '.block_course_calculator .advanced-calculator button[data-value="' . addslashes($label) . '"]'
             );
         }
 
         if (!$button) {
             $button = $this->find(
                 'xpath',
-                '//div[contains(@class,"block_exam_calculator")]' .
+                '//div[contains(@class,"block_course_calculator")]' .
                 '//div[contains(@class,"advanced-calculator")]' .
                 '//button[normalize-space(.)=' . $this->xpath_literal($label) . ']'
             );
@@ -181,11 +181,11 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Set the block calculator mode.
      *
-     * @Given /^the exam calculator block mode is "([^"]*)"$/
+     * @Given /^the Course Calculator block mode is "([^"]*)"$/
      * @param string $mode
      * @return void
      */
-    public function the_exam_calculator_block_mode_is(string $mode): void {
+    public function the_course_calculator_block_mode_is(string $mode): void {
         $allowed = ['basic', 'scientific'];
         if (!in_array($mode, $allowed, true)) {
             throw new \Exception('Unsupported calculator mode: ' . $mode);
@@ -197,22 +197,22 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Press a button in the calculator block.
      *
-     * @When /^I press "([^"]*)" in the exam calculator block$/
+     * @When /^I press "([^"]*)" in the Course Calculator block$/
      * @param string $label
      * @return void
      */
-    public function i_press_in_the_exam_calculator_block(string $label): void {
+    public function i_press_in_the_course_calculator_block(string $label): void {
         $this->press_button($label);
     }
 
     /**
      * Press several buttons in order.
      *
-     * @When /^I press the following buttons in the exam calculator block:$/
+     * @When /^I press the following buttons in the Course Calculator block:$/
      * @param \Behat\Gherkin\Node\TableNode $table
      * @return void
      */
-    public function i_press_the_following_buttons_in_the_exam_calculator_block(\Behat\Gherkin\Node\TableNode $table): void {
+    public function i_press_the_following_buttons_in_the_course_calculator_block(\Behat\Gherkin\Node\TableNode $table): void {
         foreach ($table->getRows() as $row) {
             foreach ($row as $label) {
                 $this->press_button(trim($label));
@@ -223,19 +223,19 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Type an expression into the calculator display.
      *
-     * @When /^I type "([^"]*)" in the exam calculator block$/
+     * @When /^I type "([^"]*)" in the Course Calculator block$/
      * @param string $expression
      * @return void
      */
-    public function i_type_in_the_exam_calculator_block(string $expression): void {
-        $display = $this->find('css', '.block_exam_calculator [data-region="display"]');
+    public function i_type_in_the_course_calculator_block(string $expression): void {
+        $display = $this->find('css', '.block_course_calculator [data-region="display"]');
         if (!$display) {
             throw new \Exception('Calculator display was not found.');
         }
 
         $escaped = json_encode($expression);
         $this->getSession()->executeScript(
-            "var input = document.querySelector('.block_exam_calculator [data-region=\"display\"]');" .
+            "var input = document.querySelector('.block_course_calculator [data-region=\"display\"]');" .
             "input.focus();" .
             "input.setSelectionRange(0, input.value.length);" .
             "var event = new Event('paste', {bubbles: true, cancelable: true});" .
@@ -249,12 +249,12 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Check display value.
      *
-     * @Then /^the exam calculator display should be "([^"]*)"$/
+     * @Then /^the Course Calculator display should be "([^"]*)"$/
      * @param string $expected
      * @return void
      */
-    public function the_exam_calculator_display_should_be(string $expected): void {
-        $display = $this->find('css', '.block_exam_calculator [data-region="display"]');
+    public function the_course_calculator_display_should_be(string $expected): void {
+        $display = $this->find('css', '.block_course_calculator [data-region="display"]');
         if (!$display) {
             throw new \Exception('Calculator display was not found.');
         }
@@ -268,12 +268,12 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Check numeric display value with a tolerance.
      *
-     * @Then /^the exam calculator display should be approximately "([^"]*)"$/
+     * @Then /^the Course Calculator display should be approximately "([^"]*)"$/
      * @param string $expected
      * @return void
      */
-    public function the_exam_calculator_display_should_be_approximately(string $expected): void {
-        $display = $this->find('css', '.block_exam_calculator [data-region="display"]');
+    public function the_course_calculator_display_should_be_approximately(string $expected): void {
+        $display = $this->find('css', '.block_course_calculator [data-region="display"]');
         if (!$display) {
             throw new \Exception('Calculator display was not found.');
         }
@@ -294,12 +294,12 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Check operation line.
      *
-     * @Then /^the exam calculator operation should be "([^"]*)"$/
+     * @Then /^the Course Calculator operation should be "([^"]*)"$/
      * @param string $expected
      * @return void
      */
-    public function the_exam_calculator_operation_should_be(string $expected): void {
-        $operation = $this->find('css', '.block_exam_calculator [data-region="operation"]');
+    public function the_course_calculator_operation_should_be(string $expected): void {
+        $operation = $this->find('css', '.block_course_calculator [data-region="operation"]');
         if (!$operation) {
             throw new \Exception('Calculator operation area was not found.');
         }
@@ -323,12 +323,12 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Check mode badge text.
      *
-     * @Then /^the exam calculator mode badge should be "([^"]*)"$/
+     * @Then /^the Course Calculator mode badge should be "([^"]*)"$/
      * @param string $expected
      * @return void
      */
-    public function the_exam_calculator_mode_badge_should_be(string $expected): void {
-        $badge = $this->find('css', '.block_exam_calculator .advanced-calculator__mode');
+    public function the_course_calculator_mode_badge_should_be(string $expected): void {
+        $badge = $this->find('css', '.block_course_calculator .advanced-calculator__mode');
         if (!$badge) {
             throw new \Exception('Calculator mode badge was not found.');
         }
@@ -342,12 +342,12 @@ class behat_block_exam_calculator extends behat_base {
     /**
      * Check that history contains a text fragment.
      *
-     * @Then /^the exam calculator history should contain "([^"]*)"$/
+     * @Then /^the Course Calculator history should contain "([^"]*)"$/
      * @param string $expected
      * @return void
      */
-    public function the_exam_calculator_history_should_contain(string $expected): void {
-        $history = $this->find('css', '.block_exam_calculator [data-region="history"]');
+    public function the_course_calculator_history_should_contain(string $expected): void {
+        $history = $this->find('css', '.block_course_calculator [data-region="history"]');
         if (!$history) {
             throw new \Exception('Calculator history was not found.');
         }

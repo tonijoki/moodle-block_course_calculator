@@ -36,7 +36,7 @@ define(['core/str'], function(Str) {
             "errordomain",
             "erroroverflow",
         ];
-        const values = await Str.get_strings(names.map((key) => ({key: key, component: "block_exam_calculator"})));
+        const values = await Str.get_strings(names.map((key) => ({key: key, component: "block_course_calculator"})));
         names.forEach((key, index) => {
             messages[key] = values[index];
         });

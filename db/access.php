@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Exam Calculator block.
+ * Course Calculator block.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen <toni.o.jokinen@helsinki.fi>
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki <toni.o.jokinen@helsinki.fi>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
 
-    'block/exam_calculator:addinstance' => [
+    'block/course_calculator:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
@@ -37,7 +37,7 @@ $capabilities = [
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks',
     ],
-    'block/exam_calculator:myaddinstance' => [
+    'block/course_calculator:myaddinstance' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [

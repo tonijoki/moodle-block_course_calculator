@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block definition for the exam calculator.
+ * Block definition for the Course Calculator.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Exam Calculator block.
+ * Course Calculator block.
  */
-class block_exam_calculator extends block_base {
+class block_course_calculator extends block_base {
 
     /**
      * Initialise block title.
@@ -35,7 +35,7 @@ class block_exam_calculator extends block_base {
      * @return void
      */
     public function init() {
-        $this->title = get_string('pluginname', 'block_exam_calculator');
+        $this->title = get_string('pluginname', 'block_course_calculator');
     }
 
     /**
@@ -84,7 +84,7 @@ class block_exam_calculator extends block_base {
         $decimalseparator = '.';
 
         $instanceid = !empty($this->instance->id) ? (int)$this->instance->id : 0;
-        $widgetid = 'block-exam-calculator-' . $instanceid;
+        $widgetid = 'block-course-calculator-' . $instanceid;
 
         $PAGE->requires->strings_for_js([
             'errorinvalidexpression',
@@ -95,9 +95,9 @@ class block_exam_calculator extends block_base {
             'errorfactorial',
             'errordomain',
             'erroroverflow',
-        ], 'block_exam_calculator');
+        ], 'block_course_calculator');
         $PAGE->requires->js_call_amd(
-            'block_exam_calculator/calculator',
+            'block_course_calculator/calculator',
             'init',
             [[
                 'elementid' => $widgetid,
@@ -106,12 +106,12 @@ class block_exam_calculator extends block_base {
             ]]
         );
 
-        $renderer = $this->page->get_renderer('block_exam_calculator');
+        $renderer = $this->page->get_renderer('block_course_calculator');
         $this->content->text = $renderer->render_calculator([
             'elementid' => $widgetid,
             'isbasic' => $mode === 'basic',
             'isscientific' => $mode === 'scientific',
-            'modebadge' => get_string('mode:' . $mode, 'block_exam_calculator'),
+            'modebadge' => get_string('mode:' . $mode, 'block_course_calculator'),
             'decimalseparator' => $decimalseparator,
         ]);
 

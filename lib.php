@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library file for block_exam_calculator.
+ * Library file for block_course_calculator.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

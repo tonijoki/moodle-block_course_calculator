@@ -1,6 +1,6 @@
-# Exam Calculator block for Moodle
+# Course Calculator block for Moodle
 
-`block_exam_calculator` is a Moodle block plugin that provides a calculator directly in the block region. It is designed especially for quiz layouts where the calculator must stay visible in the side column, including Safe Exam Browser oriented use cases.
+`block_course_calculator` is a Moodle block plugin that provides a calculator directly in the block region. It is designed especially for quiz layouts where the calculator must stay visible in the side column, including Safe Exam Browser oriented use cases.
 
 ## Features
 
@@ -16,7 +16,7 @@
 
 ## Installation
 
-1. Copy the plugin into `blocks/exam_calculator`
+1. Copy the plugin into `blocks/course_calculator`
 2. Visit Moodle site administration to complete the installation
 3. Add the block to the required page, course or quiz layout
 4. Open the block configuration and choose the calculator mode
@@ -54,7 +54,7 @@ Current automated coverage includes:
 Example Behat command:
 
 ```bash
-vendor/bin/behat --config /path/to/behat.yml --profile=chrome blocks/exam_calculator/tests/behat/calculator.feature
+vendor/bin/behat --config /path/to/behat.yml --profile=chrome blocks/course_calculator/tests/behat/calculator.feature
 ```
 
 ## Manual testing still recommended

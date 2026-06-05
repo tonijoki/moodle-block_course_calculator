@@ -17,15 +17,15 @@
 /**
  * Version information.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'block_exam_calculator';
-$plugin->version = 2026060100;
+$plugin->component = 'block_course_calculator';
+$plugin->version = 2026060500;
 $plugin->requires = 2018051700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = 'v1.0.0';

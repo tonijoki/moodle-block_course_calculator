@@ -17,8 +17,8 @@
 /**
  * Block instance edit form.
  *
- * @package    block_exam_calculator
- * @copyright  2024 Toni Jokinen
+ * @package    block_course_calculator
+ * @copyright  2024 onwards Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/blocks/edit_form.php');
 
 /**
- * Edit form for the exam calculator block.
+ * Edit form for the Course Calculator block.
  */
-class block_exam_calculator_edit_form extends block_edit_form {
+class block_course_calculator_edit_form extends block_edit_form {
 
     /**
      * Define instance configuration form.
@@ -41,20 +41,20 @@ class block_exam_calculator_edit_form extends block_edit_form {
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
         $options = [
-            'basic' => get_string('mode:basic', 'block_exam_calculator'),
-            'scientific' => get_string('mode:scientific', 'block_exam_calculator'),
+            'basic' => get_string('mode:basic', 'block_course_calculator'),
+            'scientific' => get_string('mode:scientific', 'block_course_calculator'),
         ];
         $mform->addElement(
             'select',
             'config_calculatormode',
-            get_string('config:calculatormode', 'block_exam_calculator'),
+            get_string('config:calculatormode', 'block_course_calculator'),
             $options
         );
         $mform->setDefault('config_calculatormode', 'basic');
         $mform->addHelpButton(
             'config_calculatormode',
             'config:calculatormode',
-            'block_exam_calculator'
+            'block_course_calculator'
         );
     }
 }

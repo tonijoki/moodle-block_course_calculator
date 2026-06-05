@@ -40,7 +40,7 @@
 
 ## Packaging
 
-- Package the plugin directory as `exam_calculator`
+- Package the plugin directory as `course_calculator`
 - Confirm the zip contains a single top-level plugin folder
 - Keep `LICENSE`, `README.md` and test files in the package unless you intentionally exclude them
 
