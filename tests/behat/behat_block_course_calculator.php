@@ -19,7 +19,7 @@
  *
  * @package    block_course_calculator
  * @category   test
- * @copyright  2024 onwards Toni Jokinen, University of Helsinki
+ * @copyright  2024 Toni Jokinen, University of Helsinki
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
