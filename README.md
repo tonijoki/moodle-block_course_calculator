@@ -1,6 +1,6 @@
 # Course Calculator block for Moodle
 
-`block_course_calculator` is a Moodle block plugin that provides a calculator directly in the block region. It is designed especially for quiz layouts where the calculator must stay visible in the side column, including Safe Exam Browser oriented use cases.
+`block_course_calculator` is a Moodle block plugin that provides a calculator directly in the block region. It is useful on course pages and activity pages where learners need a calculator without leaving the current Moodle page.
 
 ## Features
 
@@ -16,10 +16,16 @@
 
 ## Installation
 
-1. Copy the plugin into `blocks/course_calculator`
-2. Visit Moodle site administration to complete the installation
-3. Add the block to the required page, course or quiz layout
-4. Open the block configuration and choose the calculator mode
+Install the plugin using Moodle's standard plugin installation process:
+
+1. Log in as an administrator.
+2. Go to `Site administration > Plugins > Install plugins`.
+3. Upload the plugin zip package.
+4. Follow Moodle's installation and upgrade steps.
+
+After installation, turn editing on and add the `Course Calculator` block to the required course or activity page.
+
+If installing manually, place the plugin in `blocks/course_calculator` and visit site administration to complete the installation.
 
 ## Configuration
 
@@ -33,7 +39,7 @@ The calculator always displays and copies decimal values with a dot separator, f
 
 ## Recommended use
 
-This plugin is intended for situations where the calculator needs to remain visible while the learner is working on another activity, especially quizzes. For quiz usage, make sure your quiz layout is configured to show blocks during attempts.
+This plugin is intended for situations where the calculator needs to remain visible while the learner is working on another activity. For quiz usage, make sure your quiz layout is configured to show blocks during attempts.
 
 ## Automated testing
 
@@ -57,23 +63,11 @@ Example Behat command:
 vendor/bin/behat --config /path/to/behat.yml --profile=chrome blocks/course_calculator/tests/behat/calculator.feature
 ```
 
-## Manual testing still recommended
-
-Automated tests are a strong regression safety net, but they do not replace manual validation in a real Safe Exam Browser environment.
-
-Recommended manual checks:
-
-- quiz attempt page layout with blocks visible
-- keyboard focus changes between answer fields and calculator
-- copy and paste behaviour inside your actual SEB configuration
-- behaviour on the real exam machines and browser stack used by your institution
-
 ## Development notes
 
 - The block is implemented with Moodle AMD JavaScript modules
 - No external calculator libraries are required
 - The calculator does not use JavaScript `eval`
-- Increase `version.php` on every change that should be detected by Moodle upgrades
 
 ## License
 
