@@ -25,8 +25,6 @@ Install the plugin using Moodle's standard plugin installation process:
 
 After installation, turn editing on and add the `Course Calculator` block to the required course or activity page.
 
-If installing manually, place the plugin in `blocks/course_calculator` and visit site administration to complete the installation.
-
 ## Configuration
 
 Each block instance can be configured separately.
