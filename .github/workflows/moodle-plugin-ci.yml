@@ -29,6 +29,7 @@ jobs:
       matrix:
         moodle-branch:
           - MOODLE_405_STABLE
+          - MOODLE_501_STABLE
         database:
           - pgsql
 
