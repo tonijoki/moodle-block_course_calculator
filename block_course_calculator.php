@@ -22,13 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Course Calculator block.
  */
 class block_course_calculator extends block_base {
-
     /**
      * Initialise block title.
      *
@@ -66,8 +63,6 @@ class block_course_calculator extends block_base {
      * @return stdClass
      */
     public function get_content() {
-        global $PAGE;
-
         if ($this->content !== null) {
             return $this->content;
         }
@@ -86,7 +81,7 @@ class block_course_calculator extends block_base {
         $instanceid = !empty($this->instance->id) ? (int)$this->instance->id : 0;
         $widgetid = 'block-course-calculator-' . $instanceid;
 
-        $PAGE->requires->strings_for_js([
+        $this->page->requires->strings_for_js([
             'errorinvalidexpression',
             'errordivisionbyzero',
             'errorunknownfunction',
@@ -96,7 +91,7 @@ class block_course_calculator extends block_base {
             'errordomain',
             'erroroverflow',
         ], 'block_course_calculator');
-        $PAGE->requires->js_call_amd(
+        $this->page->requires->js_call_amd(
             'block_course_calculator/calculator',
             'init',
             [[

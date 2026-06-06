@@ -22,13 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renderer implementation.
  */
 class block_course_calculator_renderer extends plugin_renderer_base {
-
     /**
      * Render calculator template.
      *

@@ -22,27 +22,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Course Calculator';
-$string['course_calculator:addinstance'] = 'Add a new Course Calculator block';
-$string['course_calculator:myaddinstance'] = 'Add a new Course Calculator block to My home';
-
+$string['clearhistory'] = 'Clear';
 $string['config:calculatormode'] = 'Calculator mode';
 $string['config:calculatormode_help'] = 'Choose whether this block instance shows a basic calculator or a scientific calculator.';
-$string['mode:basic'] = 'Basic';
-$string['mode:scientific'] = 'Scientific';
-
-$string['inputlabel'] = 'Calculator input';
-$string['historytitle'] = 'History';
-$string['clearhistory'] = 'Clear';
+$string['course_calculator:addinstance'] = 'Add a new Course Calculator block';
+$string['course_calculator:myaddinstance'] = 'Add a new Course Calculator block to My home';
+$string['errorarity'] = 'Wrong number of function arguments.';
+$string['errordivisionbyzero'] = 'Division by zero is not allowed.';
+$string['errordomain'] = 'Value is outside the valid function range.';
+$string['errorfactorial'] = 'Factorial is only available for non-negative integers.';
+$string['errorinvalidexpression'] = 'Invalid expression.';
+$string['errorinvalidnumber'] = 'Invalid number.';
+$string['erroroverflow'] = 'Result is too large.';
+$string['errorunknownfunction'] = 'Unknown function.';
 $string['hintbasic'] = 'Basic mode supports arithmetic, brackets, decimal values, modulo and sign toggle.';
 $string['hintscientific'] = 'Scientific mode adds powers, factorial, constants and common scientific functions.';
+$string['historytitle'] = 'History';
+$string['inputlabel'] = 'Calculator input';
+$string['mode:basic'] = 'Basic';
+$string['mode:scientific'] = 'Scientific';
+$string['pluginname'] = 'Course Calculator';
 $string['privacy:metadata'] = 'The Course Calculator block does not store any personal data.';
-
-$string['errorinvalidexpression'] = 'Invalid expression.';
-$string['errordivisionbyzero'] = 'Division by zero is not allowed.';
-$string['errorunknownfunction'] = 'Unknown function.';
-$string['errorinvalidnumber'] = 'Invalid number.';
-$string['errorarity'] = 'Wrong number of function arguments.';
-$string['errorfactorial'] = 'Factorial is only available for non-negative integers.';
-$string['errordomain'] = 'Value is outside the valid function range.';
-$string['erroroverflow'] = 'Result is too large.';

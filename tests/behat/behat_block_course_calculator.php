@@ -29,7 +29,6 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * Behat steps for the Course Calculator block.
  */
 class behat_block_course_calculator extends behat_base {
-
     /**
      * Return the outer Moodle block element.
      *

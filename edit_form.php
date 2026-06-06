@@ -30,7 +30,6 @@ require_once($CFG->dirroot . '/blocks/edit_form.php');
  * Edit form for the Course Calculator block.
  */
 class block_course_calculator_edit_form extends block_edit_form {
-
     /**
      * Define instance configuration form.
      *

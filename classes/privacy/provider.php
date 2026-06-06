@@ -24,13 +24,10 @@
 
 namespace block_course_calculator\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The Course Calculator block does not store personal data.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
-
     /**
      * Explain that this plugin stores no personal data.
      *
