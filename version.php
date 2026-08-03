@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_course_calculator';
-$plugin->version = 2026060601;
+$plugin->version = 2026072800;
 $plugin->requires = 2024100700;
-$plugin->supported = [405, 501];
+$plugin->supported = [405, 502];
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.0.0';
+$plugin->release = 'v1.0.1';

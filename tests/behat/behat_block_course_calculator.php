@@ -339,6 +339,23 @@ class behat_block_course_calculator extends behat_base {
     }
 
     /**
+     * Check that calculator initialisation did not move focus to its input.
+     *
+     * @Then /^the Course Calculator input should not be focused$/
+     * @return void
+     */
+    public function the_course_calculator_input_should_not_be_focused(): void {
+        $isfocused = $this->getSession()->evaluateScript(
+            'return document.activeElement === ' .
+            'document.querySelector(\'.block_course_calculator [data-region="display"]\');'
+        );
+
+        if ($isfocused) {
+            throw new \Exception('The Course Calculator input unexpectedly received focus.');
+        }
+    }
+
+    /**
      * Check that history contains a text fragment.
      *
      * @Then /^the Course Calculator history should contain "([^"]*)"$/

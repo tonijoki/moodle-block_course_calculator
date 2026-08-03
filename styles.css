@@ -1,3 +1,21 @@
+/*
+ * This file is part of Moodle - http://moodle.org/
+ *
+ * Moodle is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Moodle is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * @package    block_course_calculator
+ * @copyright  2024 Toni Jokinen, University of Helsinki
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 .block_course_calculator .no-overflow {
     overflow: visible;
 }
@@ -10,13 +28,15 @@
 }
 
 .block_course_calculator .advanced-calculator {
-    --calc-border: #d7dde8;
-    --calc-panel: #f7f9fc;
-    --calc-panel-strong: #e7eef9;
-    --calc-text: #1f2937;
-    --calc-accent: #0f6cbf;
-    --calc-accent-strong: #0b4f8a;
-    --calc-danger: #b42318;
+    --calc-border: var(--bs-border-color, #d7dde8);
+    --calc-panel: var(--bs-tertiary-bg, #f7f9fc);
+    --calc-panel-strong: var(--bs-secondary-bg, #e7eef9);
+    --calc-text: var(--bs-body-color, #1f2937);
+    --calc-muted: var(--bs-secondary-color, #526071);
+    --calc-accent: var(--bs-primary, #0f6cbf);
+    --calc-accent-strong: var(--bs-link-hover-color, #0b4f8a);
+    --calc-danger: var(--bs-danger, #b42318);
+    --calc-surface: var(--bs-body-bg, #fff);
     display: block;
     width: 100%;
     max-width: 100%;
@@ -35,8 +55,7 @@
     padding: 0.75rem;
     border: 1px solid var(--calc-border);
     border-radius: 0.85rem;
-    background: linear-gradient(180deg, #ffffff 0%, var(--calc-panel) 100%);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    background: var(--calc-panel);
 }
 
 .block_course_calculator .advanced-calculator__top {
@@ -67,7 +86,7 @@
 
 .block_course_calculator .advanced-calculator__operation {
     min-height: 1.2rem;
-    color: #526071;
+    color: var(--calc-muted);
     font-size: 0.8rem;
     text-align: right;
     user-select: text;
@@ -79,7 +98,7 @@
     width: 100%;
     border: 1px solid var(--calc-border);
     border-radius: 0.7rem;
-    background: #fff;
+    background: var(--calc-surface);
     padding: 0.65rem 0.75rem;
 }
 
@@ -94,7 +113,7 @@
 .block_course_calculator .advanced-calculator__error {
     display: none;
     border-radius: 0.7rem;
-    background: #fff2f1;
+    background: var(--bs-danger-bg-subtle, #fff2f1);
     color: var(--calc-danger);
     padding: 0.55rem 0.7rem;
     font-size: 0.82rem;
@@ -118,7 +137,7 @@
 }
 
 .block_course_calculator .advanced-calculator__history-title {
-    color: #526071;
+    color: var(--calc-muted);
     font-size: 0.74rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -150,7 +169,7 @@
 .block_course_calculator .advanced-calculator__history-item {
     border: 1px solid var(--calc-border);
     border-radius: 0.65rem;
-    background: #fff;
+    background: var(--calc-surface);
     padding: 0.45rem 0.6rem;
     font-size: 0.82rem;
     line-height: 1.35;
@@ -160,7 +179,7 @@
 }
 
 .block_course_calculator .advanced-calculator__history-expression {
-    color: #526071;
+    color: var(--calc-muted);
 }
 
 .block_course_calculator .advanced-calculator__history-result {
@@ -176,7 +195,7 @@
     flex: 1 1 auto;
     border: 1px solid var(--calc-border);
     border-radius: 0.6rem;
-    background: #fff;
+    background: var(--calc-surface);
     padding: 0.45rem 0.55rem;
     font-size: 0.75rem;
     font-weight: 700;
@@ -184,7 +203,7 @@
 
 .block_course_calculator .advanced-calculator__toggle.is-active {
     border-color: var(--calc-accent);
-    background: #e8f2fb;
+    background: var(--bs-primary-bg-subtle, #e8f2fb);
     color: var(--calc-accent-strong);
 }
 
@@ -195,7 +214,7 @@
 }
 
 .block_course_calculator .advanced-calculator__panel--scientific {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .block_course_calculator .advanced-calculator__panel--memory {
@@ -205,7 +224,7 @@
 .block_course_calculator .advanced-calculator__btn {
     border: 1px solid var(--calc-border);
     border-radius: 0.7rem;
-    background: #fff;
+    background: var(--calc-surface);
     color: var(--calc-text);
     min-height: 2.5rem;
     padding: 0.4rem 0.3rem;
@@ -216,8 +235,8 @@
 
 .block_course_calculator .advanced-calculator__btn:hover,
 .block_course_calculator .advanced-calculator__btn:focus {
-    border-color: #95b8de;
-    background: #f8fbff;
+    border-color: var(--calc-accent);
+    background: var(--calc-panel);
     transform: translateY(-1px);
 }
 
@@ -238,7 +257,7 @@
 }
 
 .block_course_calculator .advanced-calculator__hint {
-    color: #526071;
+    color: var(--calc-muted);
     font-size: 0.74rem;
     line-height: 1.35;
 }

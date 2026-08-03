@@ -19,6 +19,9 @@ Feature: Use the Course Calculator block
     And the Course Calculator history should contain "2+2"
     And the Course Calculator history should contain "= 4"
 
+  Scenario: Calculator initialisation does not move keyboard focus
+    Then the Course Calculator input should not be focused
+
   Scenario: Basic mode DEL removes the latest digit
     When I press the following buttons in the Course Calculator block:
       | 1 | 2 | 3 | DEL |
@@ -73,6 +76,24 @@ Feature: Use the Course Calculator block
       | 9 | sqrt | = |
     Then the Course Calculator display should be "3"
     And the Course Calculator operation should be "sqrt(9) ="
+
+  Scenario: Scientific functions can be used with calculator buttons
+    Given the Course Calculator block mode is "scientific"
+    When I press the following buttons in the Course Calculator block:
+      | sin | 3 | 0 | ) | = |
+    Then the Course Calculator display should be approximately "0.5"
+
+  Scenario: Scientific power function can be used with calculator buttons
+    Given the Course Calculator block mode is "scientific"
+    When I press the following buttons in the Course Calculator block:
+      | pow | 2 | ; | 1 | 0 | ) | = |
+    Then the Course Calculator display should be approximately "1024"
+
+  Scenario: Scientific constants can start a calculation
+    Given the Course Calculator block mode is "scientific"
+    When I press the following buttons in the Course Calculator block:
+      | pi | = |
+    Then the Course Calculator display should be approximately "3.1415926536"
 
   Scenario: Scientific mode CE clears only the current entry
     Given the Course Calculator block mode is "scientific"

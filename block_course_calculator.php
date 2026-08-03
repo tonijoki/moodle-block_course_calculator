@@ -51,8 +51,10 @@ class block_course_calculator extends block_base {
      */
     public function applicable_formats() {
         return [
-            'all' => true,
+            'all' => false,
             'site-index' => true,
+            'course-view' => true,
+            'mod' => true,
             'my' => true,
         ];
     }

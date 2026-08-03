@@ -16,7 +16,7 @@
 
 ## Requirements
 
-- Moodle 4.5 or later
+- Moodle 4.5 through 5.2
 
 ## Installation
 
@@ -56,6 +56,7 @@ Current automated coverage includes:
 - percentage calculations
 - memory actions
 - scientific square root
+- scientific functions and constants using calculator buttons
 - block visibility on a quiz activity page
 - history rendering
 
@@ -67,7 +68,7 @@ vendor/bin/behat --config /path/to/behat.yml --profile=chrome blocks/course_calc
 
 ## Development notes
 
-- The block is implemented with Moodle AMD JavaScript modules
+- The block is implemented with Moodle ES modules compiled to AMD
 - No external calculator libraries are required
 - The calculator does not use JavaScript `eval`
 

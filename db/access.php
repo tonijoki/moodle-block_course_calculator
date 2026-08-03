@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
 
     'block/course_calculator:addinstance' => [
-        'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => [
