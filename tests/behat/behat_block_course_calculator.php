@@ -108,6 +108,8 @@ class behat_block_course_calculator extends behat_base {
      */
     protected function press_button(string $label): void {
         $button = null;
+        $functionlabels = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'ln', 'log', 'exp', 'abs', 'pow'];
+        $buttonvalue = in_array($label, $functionlabels, true) ? $label . '(' : $label;
 
         if ($label === '=') {
             $button = $this->find(
@@ -157,7 +159,7 @@ class behat_block_course_calculator extends behat_base {
         } else {
             $button = $this->find(
                 'css',
-                '.block_course_calculator .advanced-calculator button[data-value="' . addslashes($label) . '"]'
+                '.block_course_calculator .advanced-calculator button[data-value="' . addslashes($buttonvalue) . '"]'
             );
         }
 

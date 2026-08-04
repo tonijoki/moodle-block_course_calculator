@@ -255,80 +255,95 @@ const tokenize = (source) => {
     return tokens;
 };
 
+const popUntilOpeningParenthesis = (operators, output) => {
+    while (operators.length && operators[operators.length - 1].value !== "(") {
+        output.push(operators.pop());
+    }
+};
+
+const processIdentifierToken = (token, nextToken, operators, argumentsStack, output) => {
+    if (nextToken && nextToken.type === "operator" && nextToken.value === "(") {
+        operators.push({type: "function", value: token.value});
+        argumentsStack.push(0);
+    } else {
+        output.push(token);
+    }
+};
+
+const processFunctionSeparator = (operators, argumentsStack, output) => {
+    popUntilOpeningParenthesis(operators, output);
+    if (!operators.length || !argumentsStack.length) {
+        throw new Error("errorinvalidexpression");
+    }
+    argumentsStack[argumentsStack.length - 1] += 1;
+};
+
+const processOpeningParenthesis = (token, nextToken, operators, argumentsStack) => {
+    operators.push(token);
+    const isEmptyFunction = nextToken && nextToken.type === "operator" && nextToken.value === ")";
+    if (argumentsStack.length && !isEmptyFunction) {
+        argumentsStack[argumentsStack.length - 1] = Math.max(argumentsStack[argumentsStack.length - 1], 1);
+    }
+};
+
+const processClosingParenthesis = (operators, argumentsStack, output) => {
+    popUntilOpeningParenthesis(operators, output);
+    if (!operators.length) {
+        throw new Error("errorinvalidexpression");
+    }
+    operators.pop();
+    if (operators.length && operators[operators.length - 1].type === "function") {
+        const fn = operators.pop();
+        output.push({type: "function", value: fn.value, argc: argumentsStack.pop()});
+    }
+};
+
+const pushRpnOperator = (token, previousToken, operators, output) => {
+    const previousAllowsUnary = !previousToken ||
+        (previousToken.type === "operator" && previousToken.value !== ")" && previousToken.value !== "!");
+    const operator = token.value === "-" && previousAllowsUnary ? "NEG" : token.value;
+
+    while (operators.length) {
+        const top = operators[operators.length - 1];
+        if (top.type === "function" || top.value === "(") {
+            break;
+        }
+        const topPrecedence = PRECEDENCE[top.value];
+        const currentPrecedence = PRECEDENCE[operator];
+        const shouldPop = RIGHT_ASSOCIATIVE[operator]
+            ? currentPrecedence < topPrecedence
+            : currentPrecedence <= topPrecedence;
+        if (!shouldPop) {
+            break;
+        }
+        output.push(operators.pop());
+    }
+    operators.push({type: "operator", value: operator});
+};
+
+const processRpnToken = (token, previousToken, nextToken, operators, argumentsStack, output) => {
+    if (token.type === "number") {
+        output.push(token);
+    } else if (token.type === "identifier") {
+        processIdentifierToken(token, nextToken, operators, argumentsStack, output);
+    } else if (token.value === ",") {
+        processFunctionSeparator(operators, argumentsStack, output);
+    } else if (token.value === "(") {
+        processOpeningParenthesis(token, nextToken, operators, argumentsStack);
+    } else if (token.value === ")") {
+        processClosingParenthesis(operators, argumentsStack, output);
+    } else {
+        pushRpnOperator(token, previousToken, operators, output);
+    }
+};
+
 const toRpn = (tokens) => {
     const output = [];
     const operators = [];
     const argumentsStack = [];
-    const previousAllowsUnary = (previousToken) => !previousToken ||
-        (previousToken.type === "operator" && previousToken.value !== ")" && previousToken.value !== "!");
 
     tokens.forEach((token, position) => {
-        const nextToken = tokens[position + 1];
-        const previousToken = tokens[position - 1];
-
-        if (token.type === "number") {
-            output.push(token);
-            return;
-        }
-        if (token.type === "identifier") {
-            if (nextToken && nextToken.type === "operator" && nextToken.value === "(") {
-                operators.push({type: "function", value: token.value});
-                argumentsStack.push(0);
-            } else {
-                output.push(token);
-            }
-            return;
-        }
-        if (token.value === ",") {
-            while (operators.length && operators[operators.length - 1].value !== "(") {
-                output.push(operators.pop());
-            }
-            if (!operators.length || !argumentsStack.length) {
-                throw new Error("errorinvalidexpression");
-            }
-            argumentsStack[argumentsStack.length - 1] += 1;
-            return;
-        }
-        if (token.value === "(") {
-            operators.push(token);
-            if (argumentsStack.length && !(nextToken && nextToken.type === "operator" && nextToken.value === ")")) {
-                argumentsStack[argumentsStack.length - 1] = Math.max(argumentsStack[argumentsStack.length - 1], 1);
-            }
-            return;
-        }
-        if (token.value === ")") {
-            while (operators.length && operators[operators.length - 1].value !== "(") {
-                output.push(operators.pop());
-            }
-            if (!operators.length) {
-                throw new Error("errorinvalidexpression");
-            }
-            operators.pop();
-            if (operators.length && operators[operators.length - 1].type === "function") {
-                const fn = operators.pop();
-                output.push({type: "function", value: fn.value, argc: argumentsStack.pop()});
-            }
-            return;
-        }
-
-        let operator = token.value;
-        if (operator === "-" && previousAllowsUnary(previousToken)) {
-            operator = "NEG";
-        }
-        while (operators.length) {
-            const top = operators[operators.length - 1];
-            if (top.type === "function" || top.value === "(") {
-                break;
-            }
-            const topPrecedence = PRECEDENCE[top.value];
-            const currentPrecedence = PRECEDENCE[operator];
-            const shouldPop = RIGHT_ASSOCIATIVE[operator] ? currentPrecedence < topPrecedence : currentPrecedence <= topPrecedence;
-            if (!shouldPop) {
-                break;
-            }
-            output.push(operators.pop());
-        }
-        operators.push({type: "operator", value: operator});
+        processRpnToken(token, tokens[position - 1], tokens[position + 1], operators, argumentsStack, output);
     });
 
     while (operators.length) {
@@ -373,45 +388,62 @@ const factorial = (value) => {
     return total;
 };
 
+const FUNCTION_HANDLERS = {
+    sin: (args, angleMode) => ensureFinite(Math.sin(toRadians(args[0], angleMode))),
+    cos: (args, angleMode) => ensureFinite(Math.cos(toRadians(args[0], angleMode))),
+    tan: (args, angleMode) => ensureFinite(Math.tan(toRadians(args[0], angleMode))),
+    asin: (args, angleMode) => {
+        if (args[0] < -1 || args[0] > 1) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(fromRadians(Math.asin(args[0]), angleMode));
+    },
+    acos: (args, angleMode) => {
+        if (args[0] < -1 || args[0] > 1) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(fromRadians(Math.acos(args[0]), angleMode));
+    },
+    atan: (args, angleMode) => ensureFinite(fromRadians(Math.atan(args[0]), angleMode)),
+    sqrt: (args) => {
+        if (args[0] < 0) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(Math.sqrt(args[0]));
+    },
+    abs: (args) => ensureFinite(Math.abs(args[0])),
+    ln: (args) => {
+        if (args[0] <= 0) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(Math.log(args[0]));
+    },
+    log: (args) => {
+        if (args[0] <= 0) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(Math.log(args[0]) / Math.log(10));
+    },
+    exp: (args) => ensureFinite(Math.exp(args[0])),
+    pow: (args) => ensureFinite(Math.pow(args[0], args[1])),
+    min: (args) => ensureFinite(Math.min.apply(null, args)),
+    max: (args) => ensureFinite(Math.max.apply(null, args)),
+    round: (args) => ensureFinite(Math.round(args[0])),
+    floor: (args) => ensureFinite(Math.floor(args[0])),
+    ceil: (args) => ensureFinite(Math.ceil(args[0])),
+};
+
 const callFunction = (name, args, angleMode) => {
     const fnName = name.toLowerCase();
     const meta = SUPPORTED_FUNCTIONS[fnName];
-    if (!meta) {
+    const handler = FUNCTION_HANDLERS[fnName];
+    if (!meta || !handler) {
         throw new Error("errorunknownfunction");
     }
     if (args.length < meta.min || args.length > meta.max) {
         throw new Error("errorarity");
     }
-    switch (fnName) {
-        case "sin": return ensureFinite(Math.sin(toRadians(args[0], angleMode)));
-        case "cos": return ensureFinite(Math.cos(toRadians(args[0], angleMode)));
-        case "tan": return ensureFinite(Math.tan(toRadians(args[0], angleMode)));
-        case "asin":
-            if (args[0] < -1 || args[0] > 1) { throw new Error("errordomain"); }
-            return ensureFinite(fromRadians(Math.asin(args[0]), angleMode));
-        case "acos":
-            if (args[0] < -1 || args[0] > 1) { throw new Error("errordomain"); }
-            return ensureFinite(fromRadians(Math.acos(args[0]), angleMode));
-        case "atan": return ensureFinite(fromRadians(Math.atan(args[0]), angleMode));
-        case "sqrt":
-            if (args[0] < 0) { throw new Error("errordomain"); }
-            return ensureFinite(Math.sqrt(args[0]));
-        case "abs": return ensureFinite(Math.abs(args[0]));
-        case "ln":
-            if (args[0] <= 0) { throw new Error("errordomain"); }
-            return ensureFinite(Math.log(args[0]));
-        case "log":
-            if (args[0] <= 0) { throw new Error("errordomain"); }
-            return ensureFinite(Math.log(args[0]) / Math.log(10));
-        case "exp": return ensureFinite(Math.exp(args[0]));
-        case "pow": return ensureFinite(Math.pow(args[0], args[1]));
-        case "min": return ensureFinite(Math.min.apply(null, args));
-        case "max": return ensureFinite(Math.max.apply(null, args));
-        case "round": return ensureFinite(Math.round(args[0]));
-        case "floor": return ensureFinite(Math.floor(args[0]));
-        case "ceil": return ensureFinite(Math.ceil(args[0]));
-        default: throw new Error("errorunknownfunction");
-    }
+    return handler(args, angleMode);
 };
 
 const evaluateExpression = (expression, angleMode) => {
@@ -442,12 +474,16 @@ const evaluateExpression = (expression, angleMode) => {
             return;
         }
         if (token.value === "NEG") {
-            if (!stack.length) { throw new Error("errorinvalidexpression"); }
+            if (!stack.length) {
+                throw new Error("errorinvalidexpression");
+            }
             stack.push(-stack.pop());
             return;
         }
         if (token.value === "!") {
-            if (!stack.length) { throw new Error("errorinvalidexpression"); }
+            if (!stack.length) {
+                throw new Error("errorinvalidexpression");
+            }
             stack.push(factorial(stack.pop()));
             return;
         }
@@ -461,10 +497,14 @@ const evaluateExpression = (expression, angleMode) => {
             case "-": stack.push(ensureFinite(left - right)); break;
             case "*": stack.push(ensureFinite(left * right)); break;
             case "/":
-                if (right === 0) { throw new Error("errordivisionbyzero"); }
+                if (right === 0) {
+                    throw new Error("errordivisionbyzero");
+                }
                 stack.push(ensureFinite(left / right)); break;
             case "%":
-                if (right === 0) { throw new Error("errordivisionbyzero"); }
+                if (right === 0) {
+                    throw new Error("errordivisionbyzero");
+                }
                 stack.push(ensureFinite(left % right)); break;
             case "^": stack.push(ensureFinite(Math.pow(left, right))); break;
             default: throw new Error("errorinvalidexpression");
@@ -621,9 +661,15 @@ const bindScientificCalculator = (root, locale) => {
     const applyUnaryOperation = (operationName) => {
         const baseValue = state.expression.trim() || state.lastResultText || "0";
         state.justEvaluated = false;
-        if (operationName === "reciprocal") { state.expression = "1/(" + baseValue + ")"; }
-        if (operationName === "square") { state.expression = "(" + baseValue + ")^2"; }
-        if (operationName === "sqrt") { state.expression = "sqrt(" + baseValue + ")"; }
+        if (operationName === "reciprocal") {
+            state.expression = "1/(" + baseValue + ")";
+        }
+        if (operationName === "square") {
+            state.expression = "(" + baseValue + ")^2";
+        }
+        if (operationName === "sqrt") {
+            state.expression = "sqrt(" + baseValue + ")";
+        }
         renderExpression(state.expression.length);
     };
     const beginFunction = (functionText) => {
@@ -719,6 +765,104 @@ const bindScientificCalculator = (root, locale) => {
             updateError(error, messages[exception.message] || messages.errorinvalidexpression || "Error");
         }
     };
+    const insertValue = (value) => {
+        if (isOperatorCharacter(value)) {
+            insertOperator(value);
+        } else {
+            prepareInputForInsert(value);
+            prepareInputForContinuation();
+            insertAtCursor(value);
+        }
+        updateError(error, "");
+    };
+    const adjustMemory = (direction) => {
+        try {
+            const expression = state.expression.trim() || state.lastResultText || "0";
+            const current = Number(evaluateExpression(expression, angleMode));
+            memoryValue = (memoryValue === null ? 0 : memoryValue) + (direction * current);
+            updateError(error, "");
+        } catch (exception) {
+            updateError(error, messages[exception.message] || messages.errorinvalidexpression || "Error");
+        }
+        focusInput(input);
+    };
+    const setAngleMode = (value) => {
+        angleMode = value;
+        toggles.forEach((toggle) => {
+            const isActive = toggle.getAttribute("data-value") === value;
+            toggle.classList.toggle("is-active", isActive);
+            toggle.setAttribute("aria-pressed", String(isActive));
+        });
+        updateError(error, "");
+        focusInput(input);
+    };
+    const actionHandlers = {
+        insert: insertValue,
+        func: (value) => {
+            beginFunction(value);
+            updateError(error, "");
+            focusInput(input);
+        },
+        clear: () => {
+            state.expression = "0";
+            operation.textContent = "";
+            state.justEvaluated = false;
+            state.lastResultText = "";
+            updateError(error, "");
+            renderExpression(state.expression.length);
+            focusInput(input);
+        },
+        "clear-entry": () => {
+            clearCurrentEntry();
+            updateError(error, "");
+            focusInput(input);
+        },
+        "history-clear": () => {
+            clearHistory(historyNode, historyItems);
+            updateError(error, "");
+            focusInput(input);
+        },
+        backspace: () => {
+            prepareInputForContinuation();
+            deleteAtCursor("backward");
+            updateError(error, "");
+            focusInput(input);
+        },
+        sign: () => {
+            prepareInputForContinuation();
+            toggleSign();
+            updateError(error, "");
+            focusInput(input);
+        },
+        unary: (value) => {
+            applyUnaryOperation(value);
+            updateError(error, "");
+            focusInput(input);
+        },
+        percent: () => {
+            prepareInputForContinuation();
+            applyPercent();
+            updateError(error, "");
+            focusInput(input);
+        },
+        evaluate: runEvaluation,
+        "memory-clear": () => {
+            memoryValue = null;
+            updateError(error, "");
+            focusInput(input);
+        },
+        "memory-add": () => adjustMemory(1),
+        "memory-subtract": () => adjustMemory(-1),
+        "memory-recall": () => {
+            prepareInputForContinuation();
+            if (memoryValue !== null) {
+                insertAtCursor(formatResult(memoryValue, locale, false));
+            }
+            updateError(error, "");
+            focusInput(input);
+        },
+        "angle-mode": setAngleMode,
+    };
 
     root.addEventListener("mousedown", (event) => {
         const button = event.target.closest("[data-action]");
@@ -734,102 +878,9 @@ const bindScientificCalculator = (root, locale) => {
         }
         const action = button.getAttribute("data-action");
         const value = button.getAttribute("data-value") || "";
-        switch (action) {
-            case "insert":
-                if (isOperatorCharacter(value)) {
-                    insertOperator(value);
-                } else {
-                    prepareInputForInsert(value);
-                    prepareInputForContinuation();
-                    insertAtCursor(value);
-                }
-                updateError(error, "");
-                break;
-            case "func":
-                beginFunction(value);
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "clear":
-                state.expression = "0";
-                operation.textContent = "";
-                state.justEvaluated = false;
-                state.lastResultText = "";
-                updateError(error, "");
-                renderExpression(state.expression.length);
-                focusInput(input);
-                break;
-            case "clear-entry":
-                clearCurrentEntry();
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "history-clear":
-                clearHistory(historyNode, historyItems);
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "backspace": {
-                prepareInputForContinuation();
-                deleteAtCursor("backward");
-                updateError(error, "");
-                focusInput(input);
-                break;
-            }
-            case "sign":
-                prepareInputForContinuation();
-                toggleSign();
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "unary":
-                applyUnaryOperation(value);
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "percent":
-                prepareInputForContinuation();
-                applyPercent();
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "evaluate":
-                runEvaluation();
-                break;
-            case "memory-clear":
-                memoryValue = null;
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "memory-add":
-            case "memory-subtract":
-                try {
-                    const current = Number(evaluateExpression(state.expression.trim() || state.lastResultText || "0", angleMode));
-                    memoryValue = (memoryValue === null ? 0 : memoryValue) + (action === "memory-add" ? current : -current);
-                    updateError(error, "");
-                } catch (exception) {
-                    updateError(error, messages[exception.message] || messages.errorinvalidexpression || "Error");
-                }
-                focusInput(input);
-                break;
-            case "memory-recall":
-                prepareInputForContinuation();
-                if (memoryValue !== null) {
-                    insertAtCursor(formatResult(memoryValue, locale, false));
-                }
-                updateError(error, "");
-                focusInput(input);
-                break;
-            case "angle-mode":
-                angleMode = value;
-                toggles.forEach((toggle) => {
-                    const isActive = toggle.getAttribute("data-value") === value;
-                    toggle.classList.toggle("is-active", isActive);
-                    toggle.setAttribute("aria-pressed", String(isActive));
-                });
-                updateError(error, "");
-                focusInput(input);
-                break;
+        const handler = actionHandlers[action];
+        if (handler) {
+            handler(value);
         }
     });
 
@@ -978,7 +1029,9 @@ const bindStandardCalculator = (root, locale) => {
             case "-": return left - right;
             case "*": return left * right;
             case "/":
-                if (right === 0) { throw new Error("errordivisionbyzero"); }
+                if (right === 0) {
+                    throw new Error("errordivisionbyzero");
+                }
                 return left / right;
             default: throw new Error("errorinvalidexpression");
         }
@@ -1140,14 +1193,18 @@ const bindStandardCalculator = (root, locale) => {
         try {
             const current = currentNumber();
             if (operationName === "reciprocal") {
-                if (current === 0) { throw new Error("errordivisionbyzero"); }
+                if (current === 0) {
+                    throw new Error("errordivisionbyzero");
+                }
                 setDisplayNumber(1 / current);
             }
             if (operationName === "square") {
                 setDisplayNumber(current * current);
             }
             if (operationName === "sqrt") {
-                if (current < 0) { throw new Error("errordomain"); }
+                if (current < 0) {
+                    throw new Error("errordomain");
+                }
                 setDisplayNumber(Math.sqrt(current));
             }
             state.overwriteDisplay = true;
@@ -1194,6 +1251,45 @@ const bindStandardCalculator = (root, locale) => {
         }
         return false;
     };
+    const recallMemory = () => {
+        if (memoryValue === null) {
+            return;
+        }
+        state.rawValue = Number.isInteger(memoryValue)
+            ? String(memoryValue)
+            : String(Number(memoryValue.toFixed(10)));
+        state.overwriteDisplay = true;
+        state.justEvaluated = false;
+        syncDisplay();
+    };
+    const actionHandlers = {
+        insert: (value) => {
+            if (isOperatorCharacter(value)) {
+                applyOperator(value);
+            } else {
+                inputDigit(value);
+                updateError(error, "");
+            }
+        },
+        evaluate: applyEquals,
+        percent: applyPercent,
+        "clear-entry": clearEntry,
+        clear: clearAll,
+        "history-clear": () => clearHistory(historyNode, historyItems),
+        backspace: backspace,
+        sign: toggleDisplaySign,
+        unary: applyUnaryOperation,
+        "memory-clear": () => {
+            memoryValue = null;
+        },
+        "memory-recall": recallMemory,
+        "memory-add": () => {
+            memoryValue = (memoryValue === null ? 0 : memoryValue) + currentNumber();
+        },
+        "memory-subtract": () => {
+            memoryValue = (memoryValue === null ? 0 : memoryValue) - currentNumber();
+        },
+    };
 
     root.addEventListener("mousedown", (event) => {
         const button = event.target.closest("[data-action]");
@@ -1209,58 +1305,11 @@ const bindStandardCalculator = (root, locale) => {
         }
         const action = button.getAttribute("data-action");
         const value = button.getAttribute("data-value") || "";
-        switch (action) {
-            case "insert":
-                if (isOperatorCharacter(value)) {
-                    applyOperator(value);
-                } else {
-                    inputDigit(value);
-                    updateError(error, "");
-                }
-                break;
-            case "evaluate":
-                applyEquals();
-                break;
-            case "percent":
-                applyPercent();
-                break;
-            case "clear-entry":
-                clearEntry();
-                break;
-            case "clear":
-                clearAll();
-                break;
-            case "history-clear":
-                clearHistory(historyNode, historyItems);
-                break;
-            case "backspace":
-                backspace();
-                break;
-            case "sign":
-                toggleDisplaySign();
-                break;
-            case "unary":
-                applyUnaryOperation(value);
-                break;
-            case "memory-clear":
-                memoryValue = null;
-                break;
-            case "memory-recall":
-                if (memoryValue !== null) {
-                    state.rawValue = Number.isInteger(memoryValue) ? String(memoryValue) : String(Number(memoryValue.toFixed(10)));
-                    state.overwriteDisplay = true;
-                    state.justEvaluated = false;
-                    syncDisplay();
-                }
-                break;
-            case "memory-add":
-                memoryValue = (memoryValue === null ? 0 : memoryValue) + currentNumber();
-                break;
-            case "memory-subtract":
-                memoryValue = (memoryValue === null ? 0 : memoryValue) - currentNumber();
-                break;
+        const handler = actionHandlers[action];
+        if (handler) {
+            handler(value);
+            focusInput(input);
         }
-        focusInput(input);
     });
 
     input.addEventListener("keydown", (event) => {
