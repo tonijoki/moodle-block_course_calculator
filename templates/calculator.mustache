@@ -35,7 +35,7 @@
         </div>
 
         <div class="advanced-calculator__screen">
-            <div class="advanced-calculator__operation" data-region="operation" role="status" aria-live="polite"></div>
+            <div class="advanced-calculator__operation" data-region="operation" aria-hidden="true"></div>
             <input
                 type="text"
                 class="advanced-calculator__input"
@@ -45,8 +45,11 @@
                 spellcheck="false"
                 inputmode="text"
                 aria-label="{{#str}}inputlabel, block_course_calculator{{/str}}"
+                aria-describedby="{{elementid}}-error"
+                aria-invalid="false"
             >
-            <div class="advanced-calculator__error" data-region="error" aria-live="polite"></div>
+            <div id="{{elementid}}-error" class="advanced-calculator__error" data-region="error" role="alert" aria-live="assertive" aria-atomic="true"></div>
+            <div class="visually-hidden" data-region="announcement" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>
 
         <div class="advanced-calculator__history">
@@ -54,10 +57,10 @@
                 <div class="advanced-calculator__history-title">{{#str}}historytitle, block_course_calculator{{/str}}</div>
                 <button type="button" class="advanced-calculator__history-clear" data-action="history-clear">{{#str}}clearhistory, block_course_calculator{{/str}}</button>
             </div>
-            <div class="advanced-calculator__history-list" data-region="history"></div>
+            <ol class="advanced-calculator__history-list" data-region="history" aria-label="{{#str}}historytitle, block_course_calculator{{/str}}"></ol>
         </div>
 
-        <div class="advanced-calculator__panel advanced-calculator__panel--memory">
+        <div class="advanced-calculator__panel advanced-calculator__panel--memory" role="group" aria-label="{{#str}}memorycontrols, block_course_calculator{{/str}}">
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-clear" aria-label="{{#str}}memoryclear, block_course_calculator{{/str}}">{{#str}}memoryclearshort, block_course_calculator{{/str}}</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-recall" aria-label="{{#str}}memoryrecall, block_course_calculator{{/str}}">{{#str}}memoryrecallshort, block_course_calculator{{/str}}</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="memory-add" aria-label="{{#str}}memoryadd, block_course_calculator{{/str}}">{{#str}}memoryaddshort, block_course_calculator{{/str}}</button>
@@ -69,7 +72,7 @@
             <button type="button" class="advanced-calculator__toggle is-active" data-action="angle-mode" data-value="DEG" aria-pressed="true" aria-label="{{#str}}degrees, block_course_calculator{{/str}}">{{#str}}degreesshort, block_course_calculator{{/str}}</button>
             <button type="button" class="advanced-calculator__toggle" data-action="angle-mode" data-value="RAD" aria-pressed="false" aria-label="{{#str}}radians, block_course_calculator{{/str}}">{{#str}}radiansshort, block_course_calculator{{/str}}</button>
         </div>
-        <div class="advanced-calculator__panel advanced-calculator__panel--scientific">
+        <div class="advanced-calculator__panel advanced-calculator__panel--scientific" role="group" aria-label="{{#str}}scientificfunctions, block_course_calculator{{/str}}">
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="sin(" aria-label="{{#str}}sine, block_course_calculator{{/str}}">sin</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="cos(" aria-label="{{#str}}cosine, block_course_calculator{{/str}}">cos</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="func" data-value="tan(" aria-label="{{#str}}tangent, block_course_calculator{{/str}}">tan</button>
@@ -85,11 +88,12 @@
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="e" aria-label="{{#str}}eulersnumber, block_course_calculator{{/str}}">e</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="(" aria-label="{{#str}}openparenthesis, block_course_calculator{{/str}}">(</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value=")" aria-label="{{#str}}closeparenthesis, block_course_calculator{{/str}}">)</button>
+            <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value="^" aria-label="{{#str}}power, block_course_calculator{{/str}}">^</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="insert" data-value=";" aria-label="{{#str}}argumentseparator, block_course_calculator{{/str}}">;</button>
         </div>
         {{/isscientific}}
 
-        <div class="advanced-calculator__panel">
+        <div class="advanced-calculator__panel" role="group" aria-label="{{#str}}calculatorbuttons, block_course_calculator{{/str}}">
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="percent" aria-label="{{#str}}percent, block_course_calculator{{/str}}">%</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="clear-entry" aria-label="{{#str}}clearentry, block_course_calculator{{/str}}">{{#str}}clearentryshort, block_course_calculator{{/str}}</button>
             <button type="button" class="advanced-calculator__btn advanced-calculator__btn--soft" data-action="clear" aria-label="{{#str}}clearall, block_course_calculator{{/str}}">{{#str}}clearallshort, block_course_calculator{{/str}}</button>

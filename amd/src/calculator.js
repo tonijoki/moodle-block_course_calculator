@@ -24,7 +24,7 @@
 import {getStrings} from 'core/str';
 
 const MAX_HISTORY_ITEMS = 5;
-const PRECEDENCE = {"+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3, "NEG": 4, "!": 5};
+const PRECEDENCE = {"+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3, "NEG": 3, "!": 5};
 const RIGHT_ASSOCIATIVE = {"^": true, "NEG": true};
 const SUPPORTED_FUNCTIONS = {
     sin: {min: 1, max: 1},
@@ -46,6 +46,7 @@ const SUPPORTED_FUNCTIONS = {
     ceil: {min: 1, max: 1},
 };
 const messages = {};
+const errorAnnouncementTimers = new WeakMap();
 
 const loadStrings = async() => {
     const names = [
@@ -57,6 +58,7 @@ const loadStrings = async() => {
         "errorfactorial",
         "errordomain",
         "erroroverflow",
+        "resultannouncement",
     ];
     const values = await getStrings(names.map((key) => ({key: key, component: "block_course_calculator"})));
     names.forEach((key, index) => {
@@ -70,13 +72,26 @@ const isEntryCharacter = (value) => /^[0-9.,]$/.test(value) || ["pi", "e", "("].
 const isOperatorCharacter = (value) => ["+", "-", "*", "/", "^"].includes(value);
 const createLocale = (decimalseparator) => ({
     decimalSeparator: decimalseparator === "." ? "." : ",",
-    groupSeparator: decimalseparator === "." ? "," : " ",
+    groupSeparator: " ",
 });
 const normalizeInput = (expression) => expression.replace(/\s+/g, "");
+const NUMBER_PATTERN = /^(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:e[+-]?\d+)?/i;
+const numberToString = (value) => {
+    ensureFinite(value);
+    if (Number.isInteger(value)) {
+        return String(value);
+    }
+    // Fixed decimal rounding would turn small nonzero answers into zero.
+    const rounded = Math.abs(value) < 0.000001 ? value.toPrecision(11) : value.toFixed(10);
+    return String(Number(rounded));
+};
 const canonicalNumberString = (text) => {
     const value = String(text || "").trim().replace(/\s+/g, "");
     if (!value) {
         return "0";
+    }
+    if (/^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)e[+-]?\d+$/i.test(value)) {
+        return value.replace(",", ".").toLowerCase();
     }
 
     let sign = "";
@@ -117,6 +132,11 @@ const canonicalNumberString = (text) => {
 const addGrouping = (integerpart, separator) => integerpart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 const localizeCanonicalNumber = (text, locale, usegrouping) => {
     let value = String(text || "0");
+    const exponentMatch = value.match(/[eE][+-]?\d+$/);
+    const exponent = exponentMatch ? exponentMatch[0] : "";
+    if (exponent) {
+        value = value.substring(0, value.length - exponent.length);
+    }
     let sign = "";
     if (value.startsWith("-")) {
         sign = "-";
@@ -139,7 +159,7 @@ const localizeCanonicalNumber = (text, locale, usegrouping) => {
         output += locale.decimalSeparator;
     }
 
-    return output;
+    return output + exponent;
 };
 const formatExpressionForDisplay = (expression, locale) => {
     const source = String(expression || "");
@@ -151,35 +171,9 @@ const formatExpressionForDisplay = (expression, locale) => {
         const next = source[index + 1] || "";
 
         if (isDigit(char) || ((char === "." || char === ",") && isDigit(next))) {
-            let token = char;
-            let end = index + 1;
-            let seenDecimal = char === "." || char === ",";
-
-            while (end < source.length) {
-                const current = source[end];
-                const after = source[end + 1] || "";
-                if (isDigit(current)) {
-                    token += current;
-                    end += 1;
-                    continue;
-                }
-                if ((current === "." || current === ",") && !seenDecimal && isDigit(after)) {
-                    token += current;
-                    seenDecimal = true;
-                    end += 1;
-                    continue;
-                }
-                if ((current === "." || current === ",") && !seenDecimal && end === source.length - 1) {
-                    token += current;
-                    seenDecimal = true;
-                    end += 1;
-                    continue;
-                }
-                break;
-            }
-
+            const token = source.substring(index).match(NUMBER_PATTERN)[0];
             output += localizeCanonicalNumber(canonicalNumberString(token), locale, true);
-            index = end;
+            index += token.length;
             continue;
         }
 
@@ -214,26 +208,9 @@ const tokenize = (source) => {
     while (index < source.length) {
         const char = source[index];
         if (isDigit(char) || ((char === "." || char === ",") && isDigit(source[index + 1] || ""))) {
-            let end = index + 1;
-            let seenDecimal = char === "." || char === ",";
-            let normalizednumber = isDigit(char) ? char : ".";
-            while (end < source.length) {
-                const current = source[end];
-                if (isDigit(current)) {
-                    normalizednumber += current;
-                    end += 1;
-                    continue;
-                }
-                if ((current === "." || current === ",") && !seenDecimal) {
-                    normalizednumber += ".";
-                    seenDecimal = true;
-                    end += 1;
-                    continue;
-                }
-                break;
-            }
-            tokens.push({type: "number", value: normalizednumber});
-            index = end;
+            const number = source.substring(index).match(NUMBER_PATTERN)[0];
+            tokens.push({type: "number", value: number.replace(",", ".")});
+            index += number.length;
             continue;
         }
         if (isAlpha(char)) {
@@ -391,7 +368,16 @@ const factorial = (value) => {
 const FUNCTION_HANDLERS = {
     sin: (args, angleMode) => ensureFinite(Math.sin(toRadians(args[0], angleMode))),
     cos: (args, angleMode) => ensureFinite(Math.cos(toRadians(args[0], angleMode))),
-    tan: (args, angleMode) => ensureFinite(Math.tan(toRadians(args[0], angleMode))),
+    tan: (args, angleMode) => {
+        const radians = toRadians(args[0], angleMode);
+        const singular = angleMode === "DEG"
+            ? Math.abs(args[0] % 180) === 90
+            : Math.abs(Math.cos(radians)) <= Number.EPSILON * 4;
+        if (singular) {
+            throw new Error("errordomain");
+        }
+        return ensureFinite(Math.tan(radians));
+    },
     asin: (args, angleMode) => {
         if (args[0] < -1 || args[0] > 1) {
             throw new Error("errordomain");
@@ -517,17 +503,37 @@ const evaluateExpression = (expression, angleMode) => {
 };
 
 const formatResult = (value, locale, usegrouping) => {
-    const text = Number.isInteger(value) ? String(value) : String(Number(value.toFixed(10)));
-    return localizeCanonicalNumber(text, locale, usegrouping !== false);
+    return localizeCanonicalNumber(numberToString(value), locale, usegrouping !== false);
 };
 const updateError = (errorNode, message) => {
+    const input = errorNode.previousElementSibling;
+    const pendingTimer = errorAnnouncementTimers.get(errorNode);
+    if (pendingTimer) {
+        window.clearTimeout(pendingTimer);
+        errorAnnouncementTimers.delete(errorNode);
+    }
     if (!message) {
         errorNode.textContent = "";
         errorNode.classList.remove("is-visible");
+        input.setAttribute("aria-invalid", "false");
         return;
     }
-    errorNode.textContent = message;
     errorNode.classList.add("is-visible");
+    input.setAttribute("aria-invalid", "true");
+    // Reinsert after the live region has been cleared so repeated errors are announced too.
+    errorNode.textContent = "";
+    const timer = window.setTimeout(() => {
+        errorNode.textContent = message;
+        errorAnnouncementTimers.delete(errorNode);
+    }, 100);
+    errorAnnouncementTimers.set(errorNode, timer);
+};
+const announceResult = (announcementNode, value) => {
+    const announcement = messages.resultannouncement.replace("{$a}", value);
+    announcementNode.textContent = "";
+    window.setTimeout(() => {
+        announcementNode.textContent = announcement;
+    }, 50);
 };
 const focusInput = (input) => {
     const position = input.value.length;
@@ -542,9 +548,9 @@ const escapeHtml = (text) => String(text)
     .replace(/'/g, "&#039;");
 const renderHistory = (historyNode, historyItems) => {
     historyNode.innerHTML = historyItems.map((item) =>
-        '<div class="advanced-calculator__history-item"><div class="advanced-calculator__history-expression">' +
+        '<li class="advanced-calculator__history-item"><div class="advanced-calculator__history-expression">' +
         escapeHtml(item.expression) + '</div><div class="advanced-calculator__history-result">= ' +
-        escapeHtml(item.result) + "</div></div>"
+        escapeHtml(item.result) + "</div></li>"
     ).join("");
 };
 const addHistory = (historyNode, historyItems, expression, result) => {
@@ -561,6 +567,7 @@ const bindScientificCalculator = (root, locale) => {
     const input = root.querySelector('[data-region="display"]');
     const operation = root.querySelector('[data-region="operation"]');
     const error = root.querySelector('[data-region="error"]');
+    const announcement = root.querySelector('[data-region="announcement"]');
     const historyNode = root.querySelector('[data-region="history"]');
     const toggles = root.querySelectorAll('[data-action="angle-mode"]');
     let angleMode = "DEG";
@@ -705,12 +712,16 @@ const bindScientificCalculator = (root, locale) => {
             state.expression = state.lastResultText;
             state.justEvaluated = false;
         }
-        if (state.expression === "" && value === "-") {
+        if ((state.expression === "" || state.expression === "0") && value === "-") {
             state.expression = "-";
             renderExpression(state.expression.length);
             return;
         }
         if (/[+\-*/^]$/.test(state.expression)) {
+            if (value === "-") {
+                insertAtCursor(value);
+                return;
+            }
             state.expression = state.expression.replace(/[+\-*/^]+$/, value);
             renderExpression(state.expression.length);
             return;
@@ -757,6 +768,7 @@ const bindScientificCalculator = (root, locale) => {
             state.lastResultText = rawFormattedValue;
             state.justEvaluated = true;
             addHistory(historyNode, historyItems, expression, formattedValue);
+            announceResult(announcement, formattedValue);
             state.expression = rawFormattedValue;
             renderExpression(state.expression.length);
             updateError(error, "");
@@ -779,7 +791,7 @@ const bindScientificCalculator = (root, locale) => {
         try {
             const expression = state.expression.trim() || state.lastResultText || "0";
             const current = Number(evaluateExpression(expression, angleMode));
-            memoryValue = (memoryValue === null ? 0 : memoryValue) + (direction * current);
+            memoryValue = ensureFinite((memoryValue === null ? 0 : memoryValue) + (direction * current));
             updateError(error, "");
         } catch (exception) {
             updateError(error, messages[exception.message] || messages.errorinvalidexpression || "Error");
@@ -951,7 +963,7 @@ const bindScientificCalculator = (root, locale) => {
             focusInput(input);
             return;
         }
-        if (event.key === "Enter") {
+        if (event.key === "Enter" || event.key === "=") {
             event.preventDefault();
             runEvaluation();
             return;
@@ -979,8 +991,16 @@ const bindScientificCalculator = (root, locale) => {
             return;
         }
         event.preventDefault();
+        const pastedExpression = String(text).replace(/\s+/g, "");
+        // Replace the initial zero (or a previous result) when pasting a new expression.
+        if ((!state.justEvaluated && state.expression === "0") ||
+                (state.justEvaluated && /^[\d.,(a-z-]/i.test(pastedExpression))) {
+            state.expression = "";
+            state.justEvaluated = false;
+            renderExpression(0);
+        }
         prepareInputForContinuation();
-        insertAtCursor(String(text).replace(/\s+/g, ""));
+        insertAtCursor(pastedExpression);
         updateError(error, "");
         focusInput(input);
     });
@@ -994,6 +1014,7 @@ const bindStandardCalculator = (root, locale) => {
     const input = root.querySelector('[data-region="display"]');
     const operation = root.querySelector('[data-region="operation"]');
     const error = root.querySelector('[data-region="error"]');
+    const announcement = root.querySelector('[data-region="announcement"]');
     const historyNode = root.querySelector('[data-region="history"]');
     let historyItems = [];
     let memoryValue = null;
@@ -1019,20 +1040,20 @@ const bindStandardCalculator = (root, locale) => {
         }
     };
     const setDisplayNumber = (value) => {
-        state.rawValue = Number.isInteger(value) ? String(value) : String(Number(value.toFixed(10)));
+        state.rawValue = numberToString(value);
         syncDisplay();
     };
     const currentNumber = () => Number(state.rawValue.endsWith(".") ? state.rawValue + "0" : state.rawValue);
     const computeBinary = (left, operatorSymbol, right) => {
         switch (operatorSymbol) {
-            case "+": return left + right;
-            case "-": return left - right;
-            case "*": return left * right;
+            case "+": return ensureFinite(left + right);
+            case "-": return ensureFinite(left - right);
+            case "*": return ensureFinite(left * right);
             case "/":
                 if (right === 0) {
                     throw new Error("errordivisionbyzero");
                 }
-                return left / right;
+                return ensureFinite(left / right);
             default: throw new Error("errorinvalidexpression");
         }
     };
@@ -1103,6 +1124,7 @@ const bindStandardCalculator = (root, locale) => {
                 setDisplayNumber(result);
                 operation.textContent = expression + " =";
                 pushHistory(expression, formatResult(result, locale, true));
+                announceResult(announcement, formatResult(result, locale, true));
                 state.lastOperator = state.pendingOperator;
                 state.lastOperand = operand;
                 state.pendingOperator = null;
@@ -1121,6 +1143,7 @@ const bindStandardCalculator = (root, locale) => {
                 setDisplayNumber(result);
                 operation.textContent = expression + " =";
                 pushHistory(expression, formatResult(result, locale, true));
+                announceResult(announcement, formatResult(result, locale, true));
                 state.accumulator = result;
                 state.justEvaluated = true;
                 updateError(error, "");
@@ -1255,12 +1278,18 @@ const bindStandardCalculator = (root, locale) => {
         if (memoryValue === null) {
             return;
         }
-        state.rawValue = Number.isInteger(memoryValue)
-            ? String(memoryValue)
-            : String(Number(memoryValue.toFixed(10)));
+        state.rawValue = numberToString(memoryValue);
         state.overwriteDisplay = true;
         state.justEvaluated = false;
         syncDisplay();
+    };
+    const adjustMemory = (direction) => {
+        try {
+            memoryValue = ensureFinite((memoryValue === null ? 0 : memoryValue) + direction * currentNumber());
+            updateError(error, "");
+        } catch (exception) {
+            updateError(error, messages[exception.message] || messages.errorinvalidexpression || "Error");
+        }
     };
     const actionHandlers = {
         insert: (value) => {
@@ -1283,12 +1312,8 @@ const bindStandardCalculator = (root, locale) => {
             memoryValue = null;
         },
         "memory-recall": recallMemory,
-        "memory-add": () => {
-            memoryValue = (memoryValue === null ? 0 : memoryValue) + currentNumber();
-        },
-        "memory-subtract": () => {
-            memoryValue = (memoryValue === null ? 0 : memoryValue) - currentNumber();
-        },
+        "memory-add": () => adjustMemory(1),
+        "memory-subtract": () => adjustMemory(-1),
     };
 
     root.addEventListener("mousedown", (event) => {

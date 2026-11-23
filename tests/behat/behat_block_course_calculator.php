@@ -248,6 +248,26 @@ class behat_block_course_calculator extends behat_base {
     }
 
     /**
+     * Paste into the focused display without selecting its current contents.
+     *
+     * @When /^I paste "([^"]*)" at the cursor in the Course Calculator block$/
+     * @param string $expression
+     * @return void
+     */
+    public function i_paste_at_cursor_in_the_course_calculator_block(string $expression): void {
+        $escaped = json_encode($expression);
+        $this->getSession()->executeScript(
+            "var input = document.querySelector('.block_course_calculator [data-region=\"display\"]');" .
+            "input.focus();" .
+            "var event = new Event('paste', {bubbles: true, cancelable: true});" .
+            "Object.defineProperty(event, 'clipboardData', {" .
+            "value: {getData: function(type) {return type === 'text/plain' ? " . $escaped . " : '';}}" .
+            "});" .
+            "input.dispatchEvent(event);"
+        );
+    }
+
+    /**
      * Check display value.
      *
      * @Then /^the Course Calculator display should be "([^"]*)"$/
@@ -263,6 +283,151 @@ class behat_block_course_calculator extends behat_base {
         $actual = (string)$display->getValue();
         if ($this->normalise_calculator_text($actual) !== $this->normalise_calculator_text($expected)) {
             throw new \Exception('Expected calculator display "' . $expected . '" but found "' . $actual . '".');
+        }
+    }
+
+    /**
+     * Check that the result is announced without moving focus.
+     *
+     * @Then /^the Course Calculator should announce "([^"]*)"$/
+     * @param string $expected
+     * @return void
+     */
+    public function the_course_calculator_should_announce(string $expected): void {
+        $escaped = json_encode($expected);
+        $selector = json_encode('.block_course_calculator [data-region="announcement"]');
+        $this->getSession()->wait(1000,
+            "(function() { var node = document.querySelector(" . $selector ."); return node && node.textContent === " . $escaped . "; })()"
+        );
+        $announcement = $this->find('css', '.block_course_calculator [data-region="announcement"]');
+        if (!$announcement || trim($announcement->getText()) !== $expected) {
+            throw new \Exception('The calculator result was not announced as expected.');
+        }
+    }
+
+    /**
+     * Check that the display has an accessible name and an associated error message.
+     *
+     * @Then /^the Course Calculator input should have an accessible name and error description$/
+     * @return void
+     */
+    public function the_course_calculator_input_should_have_an_accessible_name_and_error_description(): void {
+        $input = $this->find('css', '.block_course_calculator [data-region="display"]');
+        if (!$input || !$input->getAttribute('aria-label') || !$input->getAttribute('aria-describedby')) {
+            throw new \Exception('The calculator input is missing its accessible name or error description.');
+        }
+        $describedby = $input->getAttribute('aria-describedby');
+        $error = $this->find('css', '#' . $describedby);
+        if (!$error || $error->getAttribute('role') !== 'alert' || $error->getAttribute('aria-live') !== 'assertive') {
+            throw new \Exception('The calculator input error description is not an alert.');
+        }
+        $display = $this->getSession()->evaluateScript(
+            "getComputedStyle(document.querySelector('.block_course_calculator [data-region=\"error\"]')).display"
+        );
+        if ($display === 'none') {
+            throw new \Exception('The calculator error alert is hidden from assistive technology.');
+        }
+    }
+
+    /**
+     * Check that an invalid expression is linked to its announced error.
+     *
+     * @Then /^the Course Calculator input should be marked invalid with an error message$/
+     * @return void
+     */
+    public function the_course_calculator_input_should_be_marked_invalid_with_an_error_message(): void {
+        $this->getSession()->wait(1000,
+            "(function() { var node = document.querySelector('.block_course_calculator [data-region=\"error\"]'); " .
+            "return node && node.textContent.length > 0; })()"
+        );
+        $input = $this->find('css', '.block_course_calculator [data-region="display"]');
+        $error = $this->find('css', '.block_course_calculator [data-region="error"]');
+        if (!$input || $input->getAttribute('aria-invalid') !== 'true' || !$error || !$error->getText()) {
+            throw new \Exception('The invalid calculation is not programmatically associated with its error.');
+        }
+    }
+
+    /**
+     * Check contrast of the calculator's text styles in the active Moodle theme.
+     *
+     * @Then /^the Course Calculator text contrast should meet WCAG AA$/
+     * @return void
+     */
+    public function the_course_calculator_text_contrast_should_meet_wcag_aa(): void {
+        $script = <<<'JS'
+(function() {
+    const selectors = [
+        '.advanced-calculator__mode',
+        '.advanced-calculator__hint',
+        '.advanced-calculator__history-title',
+        '.advanced-calculator__input',
+        '.advanced-calculator__btn:not(.advanced-calculator__btn--soft):not(.advanced-calculator__btn--accent)',
+        '.advanced-calculator__btn--soft',
+        '.advanced-calculator__btn--accent',
+        '.advanced-calculator__error',
+    ];
+    const calculator = document.querySelector('.block_course_calculator .advanced-calculator');
+    const error = calculator.querySelector('[data-region="error"]');
+    error.textContent = 'Example error';
+    error.classList.add('is-visible');
+    const parse = (value) => {
+        const match = value.match(/[\d.]+/g).map(Number);
+        return match.slice(0, 3);
+    };
+    const background = (element) => {
+        for (let node = element; node && node !== document.documentElement; node = node.parentElement) {
+            const value = getComputedStyle(node).backgroundColor;
+            if (value !== 'rgba(0, 0, 0, 0)' && value !== 'transparent') {
+                return parse(value);
+            }
+        }
+        return [255, 255, 255];
+    };
+    const luminance = (rgb) => {
+        const channels = rgb.map((value) => {
+            const channel = value / 255;
+            return channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    return JSON.stringify(selectors.map((selector) => {
+        const element = calculator.querySelector(selector);
+        const foreground = parse(getComputedStyle(element).color);
+        const bg = background(element);
+        const values = [luminance(foreground), luminance(bg)].sort((a, b) => b - a);
+        return {selector: selector, ratio: (values[0] + 0.05) / (values[1] + 0.05)};
+    }));
+})()
+JS;
+        $results = json_decode($this->getSession()->evaluateScript($script), true);
+        if (!is_array($results)) {
+            throw new \Exception('Could not calculate calculator text contrast.');
+        }
+        foreach ($results as $result) {
+            if ($result['ratio'] < 4.5) {
+                throw new \Exception('Text contrast is below 4.5:1 for ' . $result['selector'] . '.');
+            }
+        }
+    }
+
+    /**
+     * Check that separate block instances keep separate display values.
+     *
+     * @Then /^the Course Calculator displays should be in order:$/
+     * @param \Behat\Gherkin\Node\TableNode $table
+     * @return void
+     */
+    public function the_course_calculator_displays_should_be_in_order(\Behat\Gherkin\Node\TableNode $table): void {
+        $displays = $this->find_all('css', '.block_course_calculator [data-region="display"]');
+        $expected = $table->getRows();
+        if (count($displays) !== count($expected)) {
+            throw new \Exception('The number of calculator displays does not match the expected values.');
+        }
+        foreach ($displays as $index => $display) {
+            $actual = $this->normalise_calculator_text((string)$display->getValue());
+            if ($actual !== $this->normalise_calculator_text($expected[$index][0])) {
+                throw new \Exception('Calculator display ' . ($index + 1) . ' has unexpected value "' . $actual . '".');
+            }
         }
     }
 

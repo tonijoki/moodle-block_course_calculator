@@ -39,9 +39,15 @@ This allows one page to use a simple calculator while another uses the scientifi
 
 The calculator always displays and copies decimal values with a dot separator, for example `1.1428571429`. This is intentional: Moodle quiz answer validation can depend on the active language pack, and dot decimals are the safest output format when answers may be pasted into quizzes using different interface languages. The calculator still accepts comma decimal input from the keyboard and pasted values.
 
-## Recommended use
+## Using the calculator in a quiz
 
-This plugin is intended for situations where the calculator needs to remain visible while the learner is working on another activity. For quiz usage, make sure your quiz layout is configured to show blocks during attempts.
+To make the calculator available during a quiz attempt:
+
+1. Turn editing on in the course and add the `Course Calculator` block to the quiz activity page. If the block is already there, check its page placement and visibility.
+2. Open the quiz, select `More` (or the three-dot menu) > `Edit settings`.
+3. Expand `Appearance` and set `Show blocks during quiz attempts` to `Yes`. Save the quiz settings.
+
+Moodle hides blocks during quiz attempts when this setting is `No`, even if the calculator block is placed on the quiz page. When the quiz requires Safe Exam Browser (SEB), Moodle uses its secure page layout; this layout supports blocks, provided the quiz setting above is enabled. Check the quiz's SEB settings separately and make sure the SEB configuration permits access to your Moodle site.
 
 ## Automated testing
 
@@ -59,6 +65,13 @@ Current automated coverage includes:
 - scientific functions and constants using calculator buttons
 - block visibility on a quiz activity page
 - history rendering
+- editing grouped values with the keyboard
+- small nonzero results and reuse of scientific notation
+- negative operands, exponent precedence and numeric overflow
+- teacher permissions and saving calculator mode through the block edit form
+- dashboard placement and calculation during a student's quiz attempt
+- assistive technology result announcements and input error association
+- calculator text contrast against the active Moodle Boost theme
 
 Example Behat command:
 
@@ -71,6 +84,21 @@ vendor/bin/behat --config /path/to/behat.yml --profile=chrome blocks/course_calc
 - The block is implemented with Moodle ES modules compiled to AMD
 - No external calculator libraries are required
 - The calculator does not use JavaScript `eval`
+- Calculations use JavaScript floating point numbers. Normal decimal results are
+  rounded to ten decimal places; very small results retain eleven significant
+  digits, and scientific notation is supported when reusing or pasting results.
+
+## Changes in v1.0.7
+
+- Fix pasted expression handling and add a visible power button in scientific mode.
+- Preserve small nonzero answers, support exponent notation, and correct power,
+  unary-minus, keyboard-entry, overflow and tangent edge cases.
+- Announce results and errors to assistive technology, associate errors with the
+  input, and use semantic lists and named control groups.
+- Add Finnish translations, improve focus visibility and reduce-motion support,
+  and increase contrast for muted and error text.
+- Add Behat coverage for calculations, accessibility, Moodle page integration
+  and the legacy calculator protection workflow.
 
 ## License
 

@@ -32,10 +32,10 @@
     --calc-panel: var(--bs-tertiary-bg, #f7f9fc);
     --calc-panel-strong: var(--bs-secondary-bg, #e7eef9);
     --calc-text: var(--bs-body-color, #1f2937);
-    --calc-muted: var(--bs-secondary-color, #526071);
+    --calc-muted: var(--bs-secondary-text-emphasis, #565e64);
     --calc-accent: var(--bs-primary, #0f6cbf);
     --calc-accent-strong: var(--bs-link-hover-color, #0b4f8a);
-    --calc-danger: var(--bs-danger, #b42318);
+    --calc-danger: var(--bs-danger-text-emphasis, #a71d2a);
     --calc-surface: var(--bs-body-bg, #fff);
     display: block;
     width: 100%;
@@ -111,16 +111,16 @@
 }
 
 .block_course_calculator .advanced-calculator__error {
-    display: none;
+    display: block;
     border-radius: 0.7rem;
     background: var(--bs-danger-bg-subtle, #fff2f1);
     color: var(--calc-danger);
-    padding: 0.55rem 0.7rem;
+    padding: 0;
     font-size: 0.82rem;
 }
 
 .block_course_calculator .advanced-calculator__error.is-visible {
-    display: block;
+    padding: 0.55rem 0.7rem;
 }
 
 .block_course_calculator .advanced-calculator__history {
@@ -164,6 +164,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .block_course_calculator .advanced-calculator__history-item {
@@ -240,6 +243,16 @@
     transform: translateY(-1px);
 }
 
+.block_course_calculator .advanced-calculator :focus-visible {
+    outline: 3px solid var(--calc-accent-strong);
+    outline-offset: 2px;
+    z-index: 1;
+}
+
+.block_course_calculator .advanced-calculator__input:focus-visible {
+    border-color: var(--calc-accent-strong);
+}
+
 .block_course_calculator .advanced-calculator__btn--accent {
     border-color: var(--calc-accent);
     background: var(--calc-accent);
@@ -260,4 +273,15 @@
     color: var(--calc-muted);
     font-size: 0.74rem;
     line-height: 1.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .block_course_calculator .advanced-calculator__btn {
+        transition: none;
+    }
+
+    .block_course_calculator .advanced-calculator__btn:hover,
+    .block_course_calculator .advanced-calculator__btn:focus {
+        transform: none;
+    }
 }
