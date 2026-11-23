@@ -296,8 +296,10 @@ class behat_block_course_calculator extends behat_base {
     public function the_course_calculator_should_announce(string $expected): void {
         $escaped = json_encode($expected);
         $selector = json_encode('.block_course_calculator [data-region="announcement"]');
-        $this->getSession()->wait(1000,
-            "(function() { var node = document.querySelector(" . $selector ."); return node && node.textContent === " . $escaped . "; })()"
+        $this->getSession()->wait(
+            1000,
+            "(function() { var node = document.querySelector(" . $selector . "); " .
+                "return node && node.textContent === " . $escaped . "; })()"
         );
         $announcement = $this->find('css', '.block_course_calculator [data-region="announcement"]');
         if (!$announcement || trim($announcement->getText()) !== $expected) {
@@ -336,9 +338,10 @@ class behat_block_course_calculator extends behat_base {
      * @return void
      */
     public function the_course_calculator_input_should_be_marked_invalid_with_an_error_message(): void {
-        $this->getSession()->wait(1000,
+        $this->getSession()->wait(
+            1000,
             "(function() { var node = document.querySelector('.block_course_calculator [data-region=\"error\"]'); " .
-            "return node && node.textContent.length > 0; })()"
+                "return node && node.textContent.length > 0; })()"
         );
         $input = $this->find('css', '.block_course_calculator [data-region="display"]');
         $error = $this->find('css', '.block_course_calculator [data-region="error"]');

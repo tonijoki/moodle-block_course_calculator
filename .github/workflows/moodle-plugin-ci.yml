@@ -41,6 +41,9 @@ jobs:
         with:
           path: plugin
 
+      - name: Remove Git metadata from plugin source
+        run: rm -rf plugin/.git
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
